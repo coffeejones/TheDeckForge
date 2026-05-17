@@ -37,4 +37,5 @@ public class Deck {
     public void setFormat(FormatType format) {
         this.format = format;
     }
+
 }

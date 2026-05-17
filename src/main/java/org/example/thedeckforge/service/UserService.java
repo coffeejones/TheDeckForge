@@ -23,4 +23,7 @@ public class UserService {
         String email = authentication.getName();
         return userRepository.findByEmail(email);
     }
+    public User getUserForm(){
+        return new User();
+    }
 }

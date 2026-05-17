@@ -22,6 +22,8 @@
             <div class="hero-eyebrow" th:if="${deck.getFormat().toString() == 'COMMANDER'}"> Commander</div>
             <div class="hero-eyebrow" th:if="${deck.getFormat().toString() == 'STANDARD'}"> Standard</div>
             <div class="hero-eyebrow" th:if="${deck.getFormat().toString() == 'DRAFT'}"> Draft</div>
+        <div class="hero-tagline" th:text="|${deck.getCards().size()}|"></div>
+        <a  th:href="@{/decks/deck-editor/{id}(id=${deck.name})}" class="btn-secondary">Ændre på decket</a>
     </div>
 </div>
 

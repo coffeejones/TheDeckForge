@@ -29,7 +29,6 @@ public DeckService(IDeckRepository deckRepository, IUserRepository userRepositor
 public void createDeck(Deck deck, Authentication auth){
     User user = userService.getCurrentUser(auth);
     deck.setCards(new ArrayList<>());
-    user.setDecks(new ArrayList<>());
     user.addDeck(deck);
     long Userid = userRepository.getUserId(user);
     deckRepository.createUserDeck(deck,Userid);
@@ -40,5 +39,9 @@ public List<Deck> getUserDecks(User user){
 }
     public Deck getDeckForm(){
         return new Deck();
+    }
+
+    public Deck getSpecificDeckFromUser(User user, String deckName){
+    return user.getDeckFromName(deckName);
     }
 }

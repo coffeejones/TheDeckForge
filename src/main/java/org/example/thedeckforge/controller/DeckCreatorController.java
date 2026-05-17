@@ -29,7 +29,6 @@ public class DeckCreatorController{
     }
     @PostMapping("/deck-creator")
     public String createDeck(@ModelAttribute("deck") Deck deck, Authentication auth){
-        System.out.println("Create deck");
         deckService.createDeck(deck, auth);
         return "redirect:/decks/user-decks";
     }
