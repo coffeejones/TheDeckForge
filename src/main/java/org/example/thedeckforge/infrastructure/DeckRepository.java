@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public class DeckRepository implements IDeckRepository {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
     @Autowired
     public DeckRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

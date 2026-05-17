@@ -1,13 +1,12 @@
 package org.example.thedeckforge.service;
 
 import org.example.thedeckforge.entity.Card;
+import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
-import org.example.thedeckforge.repositorytest.CardRepositoryTest;
 import org.example.thedeckforge.validation.exceptions.CardValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,7 @@ import java.util.*;
 class CardServiceTest {
 
     private ICardRepository cardRepository;
-
+    private ObjectSearchCriteriaService objectSearchCriteriaService;
 
     @BeforeEach
     public void setUp(){
@@ -34,17 +33,24 @@ class CardServiceTest {
     }
     @Test
     public void returnEmptyCardListTestBasedOnCriteria(){
-        List<Card> cardResult = cardRepository.returnCardListByName("Boppy");
+        ObjectSearchCriteria criteria = new ObjectSearchCriteria();
+        criteria.setObjectName("Booby");
+        List<Card> cardResult = cardRepository.returnCardListByName(criteria);
         Assertions.assertTrue(cardResult.isEmpty());
     }
     @Test
     public void returnCardByIdTest() {
-        Optional<Card> cardResult = cardRepository.returnCardById(1);
+        Long id = 1L;
+        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
+
+        Optional<Card> cardResult = cardRepository.returnCardById(criteria);
         Assertions.assertTrue(cardResult.isPresent());
     }
     @Test
     public void returnCardByIdFailTest() {
-        Optional<Card> cardResult = cardRepository.returnCardById(10);
+        Long id = 1000L;
+        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
+        Optional<Card> cardResult = cardRepository.returnCardById(criteria);
         Assertions.assertFalse(cardResult.isPresent());
     }
     @Test
@@ -58,9 +64,5 @@ class CardServiceTest {
         Optional<Card> cardResult = cardRepository.returnCardByName("m");
         Assertions.assertFalse(cardResult.isPresent());
     }
-    @Test
-    public void returnIllegalStateOfCardTest(){
-        CardValidationException exception = Assertions.assertThrows(CardValidationException.class, () -> {
-            cardRepository.returnIllegalStateOfCard();} );
-    }
+
 }

@@ -3,10 +3,6 @@ package org.example.thedeckforge.seclayer;   // <-- byt til "config" eller "secu
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,25 +13,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity //This should allow us to accept users based on they roles
 public class SecurityConfig {
 
+
+    private final CustomAuthenticationProvider customAuthenticationProvider;
+
     @Autowired
-    private CustomAuthenticationProvider customAuthenticationProvider;
-
-    // === Hierarki: ADMIN > ORGANIZER > MEMBER ===
-    @Bean //This sets the role
-    public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.fromHierarchy("""
-            ROLE_ADMIN > ROLE_ORGANIZER
-            ROLE_ORGANIZER > ROLE_MEMBER
-            """);
-    }
-
-    // === Sørg for at @PreAuthorize også respekterer hierarkiet ===
-    // BEMÆRK: skal være 'static' for at blive bygget tidligt nok
-    @Bean
-    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
-        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
-        handler.setRoleHierarchy(roleHierarchy);
-        return handler;
+    public SecurityConfig(CustomAuthenticationProvider customAuthenticationProvider) {
+        this.customAuthenticationProvider = customAuthenticationProvider;
     }
 
     // === Sikkerhedsregler for HTTP requests ===
@@ -58,7 +41,7 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form // This is where we can config how spring security is suppose to handle it's form, when it comes to login.
+                .formLogin(form -> form // This is where we can config how spring security is supposed to handle its form, when it comes to log in.
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")

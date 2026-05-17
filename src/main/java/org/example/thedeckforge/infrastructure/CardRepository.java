@@ -1,11 +1,14 @@
 package org.example.thedeckforge.infrastructure;
 
 import org.example.thedeckforge.entity.Card;
+import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +16,11 @@ import java.util.Optional;
 public class CardRepository implements ICardRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final SQLQueryBuilder criteriaBuilder;
     @Autowired
-    public CardRepository(JdbcTemplate jdbcTemplate) {
+    public CardRepository(JdbcTemplate jdbcTemplate, SQLQueryBuilder criteriaBuilder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.criteriaBuilder = criteriaBuilder;
     }
     @Override
     public void populateCardList() {
@@ -25,9 +30,10 @@ public class CardRepository implements ICardRepository {
         return List.of();
     }
     @Override
-    public List<Card> returnCardListByName(String searchCriteria) {
-        String sqlQuery = "SELECT * FROM Cards WHERE CharacterName LIKE ?";
-        return jdbcTemplate.query(sqlQuery,(rs, rowNum) ->
+    public List<Card> returnCardListByName(ObjectSearchCriteria criteria) {
+        List<Object> params = new ArrayList<>(); // Ai anvendt, Object bliver brugt siden listen af ting vi gerne vil søge efter kan bestå af flere ting som både String og enums.
+        String sqlQuery = criteriaBuilder.sqlQuery(criteria, params);
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
                 new Card(
                         rs.getLong("CardId"),
                         rs.getString("CharacterName"),
@@ -40,12 +46,13 @@ public class CardRepository implements ICardRepository {
                         rs.getString("ManaCost"),
                         rs.getInt("ATK"),
                         rs.getInt("DEF")
-                ), searchCriteria
+                ), params.toArray()
         );
     }
     @Override
-    public Optional<Card> returnCardById(long id) {
-        String sqlQuery = "SELECT * FROM Cards WHERE CardId = ?";
+    public Optional<Card> returnCardById(ObjectSearchCriteria  criteria) {
+        List<Object> params = new ArrayList<>();
+        String sqlQuery = criteriaBuilder.sqlQuery(criteria, params);
         return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) ->
                 new Card(rs.getLong("CardId"),
                         rs.getString("CharacterName"),
@@ -58,7 +65,7 @@ public class CardRepository implements ICardRepository {
                         rs.getString("ManaCost"),
                         rs.getInt("ATK"),
                         rs.getInt("DEF")
-                ), id
+                ), params.toArray()
         ));
     }
     @Override

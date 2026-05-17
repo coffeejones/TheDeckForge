@@ -1,6 +1,7 @@
 package org.example.thedeckforge.controller;
 
 import org.example.thedeckforge.entity.Card;
+import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,8 @@ public class CardController {
         return "card-search";
     }
     @GetMapping("/card-list")
-    public String cardListController(@RequestParam String searchTerm, Model model){
-        List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm);
+    public String cardListController(@RequestParam String searchTerm, Model model, CardType cardType) {
+        List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm, cardType);
         model.addAttribute("searchResults", searchResults);
         model.addAttribute("searchTerm", searchTerm);
         return "card-list";
