@@ -1,12 +1,62 @@
 package org.example.thedeckforge.service;
 
-import jdk.jfr.Event;
+import org.example.thedeckforge.entity.Event;
+import org.example.thedeckforge.entity.User;
+import org.example.thedeckforge.entity.interfaces.IEventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class EventService {
-    private List<Event> events = new ArrayList<>();
+    private final IEventRepository ieventRepository;
 
+    @Autowired
+    public EventService(IEventRepository ieventRepository) {
+        this.ieventRepository = ieventRepository;
+    }
+
+
+    public List<Event> getAllEvents() {
+        return ieventRepository.findAll();
+    }
+
+
+    public Optional<Event> getEventById(long id) {
+        return ieventRepository.findById(id);
+    }
+
+    public Event createEvent(Event event) {
+        return ieventRepository.save(event);
+    }
+
+    public Event updateEvent(long id, Event updateEvent) {
+        Event existing = ieventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
+
+        existing.setName(updateEvent.getName());
+        existing.setDate(updateEvent.getDate());
+        existing.setLocation(updateEvent.getDescription());
+        existing.setParticipants(updateEvent.getParticipants());
+
+        return existing;
+    }
+
+    public boolean deleteEvent(long id) {
+        return ieventRepository.deleteById(id);
+    }
+
+    public boolean addParticipant(long id, long userId) {
+        Event event = ieventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
+        if (!event.getParticipants().contains(userId)) {
+            event.getParticipants().add(userId);
+            return true;
+        }
+        return false;
+    }
 }

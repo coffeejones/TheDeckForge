@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Events - Deckforge</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div th:replace="fragments/navbar :: navbar"></div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-eyebrow">✦ velkommen ✦</span>
+        <h1> Events</h1>
+        <p class="hero-tagline">
+        </p>
+    </div>
+</section>
 </body>
 </html>
