@@ -1,7 +1,10 @@
 package org.example.thedeckforge.service;
 import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.User;
+import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.example.thedeckforge.entity.interfaces.IDeckRepository;
+import org.example.thedeckforge.entity.interfaces.IUserRepository;
+import org.example.thedeckforge.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -12,20 +15,25 @@ import java.util.List;
 public class DeckService {
 private final IDeckRepository deckRepository;
 private final UserService userService;
+private final IUserRepository userRepository;
+private final ICardRepository cardRepository;
 
 @Autowired
-public DeckService(IDeckRepository deckRepository, UserService userService) {
+public DeckService(IDeckRepository deckRepository, UserService userService, IUserRepository userRepository,  ICardRepository cardRepository) {
     this.deckRepository = deckRepository;
     this.userService = userService;
+    this.userRepository = userRepository;
+    this.cardRepository = cardRepository;
 }
 
 public void createDeck(Deck deck, User user){
     deck.setCards(new ArrayList<>());
     user.addDeck(deck);
-    deckRepository.createUserDeck(deck,user);
+
+    deckRepository.createUserDeck(deck,userRepository.getUserId(user));
 }
 public List<Deck> getUserDecks(User user){
-    return deckRepository.getUsersDecks(user);
+    return cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
 }
     public Deck getDeckForm(){
         return new Deck();

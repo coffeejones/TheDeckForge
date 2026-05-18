@@ -1,6 +1,7 @@
 package org.example.thedeckforge.entity.interfaces;
 
 import org.example.thedeckforge.entity.Card;
+import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -15,6 +16,7 @@ public interface ICardRepository {
     Optional<Card> returnCardById(ObjectSearchCriteria criteria);
     Optional<Card> returnCardByName(String name);
     void saveCard(Card card);
+    List<Deck> getDecksCards(List<Deck> decks);
 
 
 }
