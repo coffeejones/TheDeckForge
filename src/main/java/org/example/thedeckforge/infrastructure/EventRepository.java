@@ -29,4 +29,5 @@ public class EventRepository implements IEventRepository {
     public boolean deleteById(long id) {
         return events.removeIf(e -> e.getId() == id);
     }
+    //placeholder
 }
