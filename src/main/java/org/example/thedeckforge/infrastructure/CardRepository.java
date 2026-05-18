@@ -4,6 +4,8 @@ import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
+import org.example.thedeckforge.infrastructure.sqlquerybuilders.CardSQLQueryBuilder;
+import org.example.thedeckforge.infrastructure.sqlquerybuilders.SQLQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,12 +18,10 @@ import java.util.Optional;
 public class CardRepository implements ICardRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final SQLQueryBuilder criteriaBuilder;
     private final CardSQLQueryBuilder cardSQLQueryBuilder;
     @Autowired
-    public CardRepository(JdbcTemplate jdbcTemplate, SQLQueryBuilder criteriaBuilder, CardSQLQueryBuilder cardSQLQueryBuilder) {
+    public CardRepository(JdbcTemplate jdbcTemplate, CardSQLQueryBuilder cardSQLQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
-        this.criteriaBuilder = criteriaBuilder;
         this.cardSQLQueryBuilder = cardSQLQueryBuilder;
     }
     @Override
