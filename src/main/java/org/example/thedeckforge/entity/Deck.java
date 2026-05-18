@@ -44,6 +44,9 @@ public class Deck {
     public void setCards(List<Card> cards) {
         this.cards = cards;
     }
+    public void removeCard(Card card){
+        this.cards.remove(card);
+    }
     public FormatType getFormat() {
         return format;
     }

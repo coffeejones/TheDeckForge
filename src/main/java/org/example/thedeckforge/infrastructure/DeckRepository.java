@@ -41,4 +41,13 @@ public class DeckRepository implements IDeckRepository {
         }
         return null;
     }
+    @Override
+    public void removeDeckCard(Deck deck, long cardId, long userId){
+        String sql = "DELETE FROM DeckCards WHERE DeckId = ? AND CardId = ? ";
+        jdbcTemplate.update(sql,getDeckId(deck),cardId);
+    }
+    private long getDeckId(Deck deck){
+        String  sql = "SELECT * FROM Decks WHERE DeckName = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("DeckId"),deck.getName() );
+    }
 }

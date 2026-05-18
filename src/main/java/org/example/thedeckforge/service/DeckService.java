@@ -1,4 +1,5 @@
 package org.example.thedeckforge.service;
+import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
@@ -41,5 +42,15 @@ public List<Deck> getUserDecks(User user){
 
     public Deck getSpecificDeckFromUser(User user, String deckName){
     return user.getDeckFromName(deckName);
+    }
+
+    public void removeCardFromDeck(String deckName, User user, Card card){
+    for (Deck deck : user.getDecks()){
+        if (deck.getName().equals(deckName)){
+            deck.removeCard(card);
+            deckRepository.removeDeckCard(deck,cardRepository.getCardId(card),userRepository.getUserId(user));
+        }
+    }
+
     }
 }

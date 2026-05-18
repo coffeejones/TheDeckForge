@@ -118,4 +118,9 @@ public class CardRepository implements ICardRepository {
         }
         return null;
     }
+    @Override
+    public long getCardId (Card card){
+        String sql = "Select CardId From Cards Where characterName = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("CardId"), card.getCardName());
+    }
 }

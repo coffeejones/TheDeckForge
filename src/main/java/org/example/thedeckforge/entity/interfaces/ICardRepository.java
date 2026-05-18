@@ -17,6 +17,6 @@ public interface ICardRepository {
     Optional<Card> returnCardByName(String name);
     void saveCard(Card card);
     List<Deck> getDecksCards(List<Deck> decks);
-
+    long getCardId(Card card);
 
 }
