@@ -44,13 +44,28 @@ public List<Deck> getUserDecks(User user){
     return user.getDeckFromName(deckName);
     }
 
-    public void removeCardFromDeck(String deckName, User user, Card card){
-    for (Deck deck : user.getDecks()){
-        if (deck.getName().equals(deckName)){
-            deck.removeCard(card);
-            deckRepository.removeDeckCard(deck,cardRepository.getCardId(card),userRepository.getUserId(user));
+    public void removeCardFromDeck(String deckName, User user, Card card) {
+        for (Deck deck : user.getDecks()) {
+            if (deck.getName().equals(deckName)) {
+                deck.removeCard(card);
+            }
         }
     }
+    public void addCardToDeck (String deckName, User user, Card card){
+        for (Deck deck : user.getDecks()) {
+            if (deck.getName().equals(deckName)) {
+                deck.addCard(card);
+            }
+        }
 
+    }
+
+    public void saveDeck(String deckName, User user){
+    ArrayList<Long> cardIds = new ArrayList<Long>();
+    Deck deck = user.getDeckFromName(deckName);
+        for (Card card : deck.getCards()) {
+            cardIds.add(cardRepository.getCardId(card));
+        }
+    deckRepository.saveDeck(cardIds, deck);
     }
 }

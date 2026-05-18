@@ -45,7 +45,16 @@ public class Deck {
         this.cards = cards;
     }
     public void removeCard(Card card){
-        this.cards.remove(card);
+        for(Card c : cards){
+            if(c.getId() == card.getId()){
+                int index = cards.indexOf(c);
+                cards.remove(index);
+                break;
+            }
+        }
+    }
+    public void addCard(Card card){
+        this.cards.add(card);
     }
     public FormatType getFormat() {
         return format;

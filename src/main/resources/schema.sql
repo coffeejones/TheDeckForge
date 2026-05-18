@@ -52,7 +52,7 @@ create table Decks (
 );
 
 create table DeckCards (
-                          DeckCardId bigint primary key,
+                          DeckCardId bigint auto_increment primary key,
                           DeckId bigint,
                           CardId bigInt,
                           foreign key(DeckId) references Decks(DeckId),
