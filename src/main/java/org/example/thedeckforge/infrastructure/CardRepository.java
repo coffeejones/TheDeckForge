@@ -17,10 +17,12 @@ public class CardRepository implements ICardRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final SQLQueryBuilder criteriaBuilder;
+    private final CardSQLQueryBuilder cardSQLQueryBuilder;
     @Autowired
-    public CardRepository(JdbcTemplate jdbcTemplate, SQLQueryBuilder criteriaBuilder) {
+    public CardRepository(JdbcTemplate jdbcTemplate, SQLQueryBuilder criteriaBuilder, CardSQLQueryBuilder cardSQLQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
         this.criteriaBuilder = criteriaBuilder;
+        this.cardSQLQueryBuilder = cardSQLQueryBuilder;
     }
     @Override
     public void populateCardList() {
@@ -32,7 +34,7 @@ public class CardRepository implements ICardRepository {
     @Override
     public List<Card> returnCardListByName(ObjectSearchCriteria criteria) {
         List<Object> params = new ArrayList<>(); // Ai anvendt, Object bliver brugt siden listen af ting vi gerne vil søge efter kan bestå af flere ting som både String og enums.
-        String sqlQuery = criteriaBuilder.sqlQuery(criteria, params);
+        String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) ->
                 new Card(
                         rs.getLong("CardId"),
@@ -52,7 +54,7 @@ public class CardRepository implements ICardRepository {
     @Override
     public Optional<Card> returnCardById(ObjectSearchCriteria  criteria) {
         List<Object> params = new ArrayList<>();
-        String sqlQuery = criteriaBuilder.sqlQuery(criteria, params);
+        String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
         return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) ->
                 new Card(rs.getLong("CardId"),
                         rs.getString("CharacterName"),
