@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**", "/cards/new", "/cards/*/edit").hasRole("ADMIN")
 
                         // ORGANIZER eller højere
-                        .requestMatchers("/events/new", "/events/*/results").hasRole("ORGANIZER")
+                        .requestMatchers("/event/new", "/event/*/results").hasRole("ORGANIZER")
 
                         // MEMBER eller højere (alle indloggede)
                         .requestMatchers("/collection/**", "/decks/**", "/trades/**").hasRole("MEMBER")
