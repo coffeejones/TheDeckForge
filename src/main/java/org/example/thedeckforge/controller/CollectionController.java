@@ -34,7 +34,7 @@ public class CollectionController {
     }
 
     @GetMapping
-    public String viewCollection(@AuthenticationPrincipal User user, Authentication auth, @RequestParam(defaultValue = "0") int page, Model model) {
+    public String viewCollection(@AuthenticationPrincipal User user, @RequestParam(defaultValue = "0") int page, Model model) {
 
         int totalCards = collectionService.countOwnedCards(user.getId());
         int totalPages = Math.max(1, (int) Math.ceil((double) totalCards / PAGE_SIZE));

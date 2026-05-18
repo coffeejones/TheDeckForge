@@ -1,16 +1,13 @@
 package org.example.thedeckforge.infrastructure;
 
-import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
-import org.example.thedeckforge.entity.User;
-import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.enums.FormatType;
 import org.example.thedeckforge.entity.interfaces.IDeckRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
+
 @Repository
 public class DeckRepository implements IDeckRepository {
 
