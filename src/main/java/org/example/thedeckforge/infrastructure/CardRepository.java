@@ -94,25 +94,28 @@ public class CardRepository implements ICardRepository {
     @Override
     public List<Deck> getDecksCards(List<Deck> decks){
         String sqlDeckContentsQuery = "SELECT * FROM Cards LEFT JOIN DeckCards ON Cards.CardId = DeckCards.CardId WHERE DeckId = ?";
-        for (Deck deck : decks) {
-            List<Card> cards = new ArrayList<>(jdbcTemplate.query(sqlDeckContentsQuery, (rs, rowNum) ->
-                    new Card(
-                            rs.getLong("CardId"),
-                            rs.getString("CharacterName"),
-                            CardType.valueOf(rs.getString("CardType").toUpperCase()),
-                            rs.getString("Color"),
-                            rs.getString("CardSet"),
-                            rs.getString("Rarity"),
-                            rs.getString("RuleText"),
-                            rs.getString("PictureReference"),
-                            rs.getString("ManaCost"),
-                            rs.getInt("ATK"),
-                            rs.getInt("DEF")
-                    ), deck.getDeckId()
-            )
-            );
-            deck.setCards(cards);
+        if(decks!=null){
+            for (Deck deck : decks) {
+                List<Card> cards = new ArrayList<>(jdbcTemplate.query(sqlDeckContentsQuery, (rs, rowNum) ->
+                        new Card(
+                                rs.getLong("CardId"),
+                                rs.getString("CharacterName"),
+                                CardType.valueOf(rs.getString("CardType").toUpperCase()),
+                                rs.getString("Color"),
+                                rs.getString("CardSet"),
+                                rs.getString("Rarity"),
+                                rs.getString("RuleText"),
+                                rs.getString("PictureReference"),
+                                rs.getString("ManaCost"),
+                                rs.getInt("ATK"),
+                                rs.getInt("DEF")
+                        ), deck.getDeckId()
+                )
+                );
+                deck.setCards(cards);
+            }
+            return decks;
         }
-        return decks;
+        return null;
     }
 }

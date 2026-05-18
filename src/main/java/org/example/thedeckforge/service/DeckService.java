@@ -28,8 +28,8 @@ public DeckService(IDeckRepository deckRepository, UserService userService, IUse
 
 public void createDeck(Deck deck, User user){
     deck.setCards(new ArrayList<>());
+    user.setDecks(new ArrayList<>());
     user.addDeck(deck);
-
     deckRepository.createUserDeck(deck,userRepository.getUserId(user));
 }
 public List<Deck> getUserDecks(User user){
