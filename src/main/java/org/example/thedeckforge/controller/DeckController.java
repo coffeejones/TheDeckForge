@@ -22,13 +22,11 @@ import java.util.List;
 @RequestMapping("/decks")
 public class DeckController {
     private final DeckService deckService;
-    private final UserService userService;
     private final CardService cardService;
 
     @Autowired
-    public DeckController(DeckService deckService, UserService userService,  CardService cardService) {
+    public DeckController(DeckService deckService, CardService cardService) {
         this.deckService = deckService;
-        this.userService = userService;
         this.cardService = cardService;
     }
     @GetMapping("/user-decks")

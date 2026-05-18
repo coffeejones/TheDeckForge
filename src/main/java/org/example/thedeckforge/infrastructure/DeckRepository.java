@@ -26,23 +26,19 @@ public class DeckRepository implements IDeckRepository {
         jdbcTemplate.update(sql,Userid,deck.getName(),deck.getFormat().toString());
     }
 
-
     @Override
-    public List<Deck> getUsersDecks (long userid){
-        String deckIdSql = "SELECT DeckID FROM Decks LEFT JOIN Users ON Decks.UserId = Users.UserId where Decks.UserId = ?";
-        List<Integer> deckIds = jdbcTemplate.queryForList(deckIdSql, Integer.class, userid);
-        String deckInfoSql = "SELECT * FROM Decks WHERE DeckID = ?";
-        List<Deck> decks = new ArrayList<>();
-        for (Integer deckId : deckIds) {
-            Deck deck = jdbcTemplate.queryForObject(deckInfoSql,(rs, rowNum) -> new Deck(rs.getString("DeckName"), FormatType.valueOf(rs.getString("Format"))), deckId);
-            deck.setCards(getCardsByDeckId(deckId));
-            decks.add(deck);
+    public List<Deck> getUsersDecks(long userId){
+        String sqlDeckQuery = "SELECT * FROM Decks WHERE UserId = ?";
+        List<Deck> decks = new ArrayList<>(jdbcTemplate.query(sqlDeckQuery, (rs, rowNum) ->
+                new Deck(
+                        rs.getLong("DeckId"),
+                        rs.getString("DeckName"),
+                        FormatType.valueOf(rs.getString("Format").toUpperCase())
+                ), userId
+        ));
+        if (!decks.isEmpty()) {
+            return decks;
         }
-        return decks;
-    }
-
-    private List<Card> getCardsByDeckId(long id){
-        String deckContentsSql = "SELECT * FROM Cards LEFT JOIN DeckCards ON Cards.CardId = DeckCards.CardId WHERE DeckId = ?";
-        return jdbcTemplate.query(deckContentsSql, (rs, rowNum) -> new Card(rs.getLong("CardId"), rs.getString("CharacterName"), CardType.valueOf(rs.getString("CardType").toUpperCase()),rs.getString("Color"), rs.getString("CardSet"), rs.getString("Rarity"), rs.getString("RuleText"), rs.getString("PictureReference"), rs.getString("ManaCost"), rs.getInt("ATK"), rs.getInt("DEF")) , id);
+        return null;
     }
 }
