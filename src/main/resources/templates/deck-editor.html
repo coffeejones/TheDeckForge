@@ -2,9 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lav et deck</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-
+<div th:if="${#lists.isEmpty(deck.getCards())}" class="empty-state">
+    <p class="hero-tagline">Du har ingen kort i dit deck endnu. Tilføj dit første kort!</p>
+</div>
+    <div th:unless="${deck.getCards().isEmpty()}" class="collection-grid">
+        <a th:each="card : ${deck.getCards()}"
+           th:href="@{/cards/card-detail/{id}(id=${card.id})}"
+           class="collection-card">
+            <div class="collection-card-image">
+                <img th:src="${card.pictureRef}" th:alt="${card.cardName}">
+            </div>
+            <div class="collection-card-name" th:text="${card.cardName}">Card Name</div>
+        </a>
+    </div>
 </body>
 </html>

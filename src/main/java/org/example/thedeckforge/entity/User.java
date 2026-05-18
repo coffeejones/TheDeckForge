@@ -2,6 +2,7 @@ package org.example.thedeckforge.entity;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -27,9 +28,11 @@ public class User {
         this.dateOfBirth = dateOfBirth;
         this.authority = authority;
         this.collection = new Collection();
+        this.decks = new ArrayList<>();
     }
     public User(){
         this.collection = new Collection();
+        this.decks = new ArrayList<>();
     }
 
     public LocalDate getDateOfBirth() {
@@ -69,5 +72,13 @@ public class User {
     }
     public Collection getCollection() {
         return collection;
+    }
+    public Deck getDeckFromName(String deckName){
+            for(Deck d : decks){
+                if(d.getName().equals(deckName)){
+                    return d;
+                }
+            }
+        return null;
     }
 }
