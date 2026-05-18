@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kort — Deckforge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<section class="collection-page">
+    <div class="container">
+
+        <header class="collection-header">
+            <span class="hero-eyebrow">✦ Resultater ✦</span>
+            <h1>Kort</h1>
+            <p class="section-subtitle" th:if="${!#lists.isEmpty(searchResults)}">
+                <strong th:text="${#lists.size(searchResults)}">0</strong> kort fundet
+            </p>
+        </header>
+
+        <form class="search-bar" th:action="@{/admin/admin-card-list}" method="get">
+            <input type="text" name="searchTerm"
+                   class="form-input"
+                   placeholder="Søg igen..."
+                   th:value="${param.searchTerm}">
+            <select name="cardType" class="form-input">
+                <option value="">Alle typer</option>
+                <option th:each="type : ${cardTypes}"
+                        th:value="${type}"
+                        th:text="${type}"
+                        th:selected="${param.cardType == type.name()}">
+                </option>
+            </select>
+            <button type="submit" class="btn btn-primary">Søg</button>
+        </form>
+
+        <div th:if="${#lists.isEmpty(searchResults)}" class="collection-empty">
+            <div class="empty-ornament">✦</div>
+            <p>Ingen kort fundet. Prøv en anden søgning.</p>
+            <a th:href="@{/cards/card-search}" class="btn btn-secondary">Tilbage til søgning</a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(searchResults)}" class="collection-grid">
+            <a th:each="card : ${searchResults}"
+               th:href="@{/admin/admin-card-detail/{id}(id=${card.id})}"
+               class="collection-card">
+                <div class="collection-card-image">
+                    <img th:src="${card.pictureRef}" th:alt="${card.cardName}">
+                </div>
+                <div class="collection-card-name" th:text="${card.cardName}">Card Name</div>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-ornament">⚜ ✦ ⚜</div>
+        <p class="footer-text">Deckforge · Anno MMXXVI</p>
+    </div>
+</footer>
+
+</body>
+</html>

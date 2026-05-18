@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ObjectSearchCriteriaService {
 
+    public ObjectSearchCriteria getObjectSearchCriteria() {
+        return new  ObjectSearchCriteria();
+    }
+
     public ObjectSearchCriteria createSearchCriteria(Long Id) {
         ObjectSearchCriteria criteria = new ObjectSearchCriteria();
         criteria.setObjectId(Id);

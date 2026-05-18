@@ -4,6 +4,7 @@ import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.CollectionService;
+import org.example.thedeckforge.service.ObjectSearchCriteriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -18,11 +19,13 @@ public class CardController {
 
     private final CardService cardService;
     private final CollectionService collectionService;
+    private final ObjectSearchCriteriaService objectSearchCriteriaService;
 
     @Autowired
-    public CardController(CardService cardService, CollectionService collectionService) {
+    public CardController(CardService cardService, CollectionService collectionService, ObjectSearchCriteriaService objectSearchCriteriaService) {
         this.cardService = cardService;
         this.collectionService = collectionService;
+        this.objectSearchCriteriaService = objectSearchCriteriaService;
     }
     @GetMapping("/card-search")
     public String cardController(Model model) {

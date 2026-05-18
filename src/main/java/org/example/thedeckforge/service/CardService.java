@@ -1,8 +1,10 @@
 package org.example.thedeckforge.service;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
+import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
+import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,10 @@ public class CardService {
         this.validationService = validationService;
     }
 
+    public List<Card> getCardListOnSearchTerm(ObjectSearchCriteria searchTerm) {
+        return cardRepository.returnCardListByName(searchTerm);
+    }
+
     public List<Card> getCardListBasedOnSearchTerm(String searchTerm, CardType cardType) {
 
         ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(searchTerm, cardType);
@@ -45,7 +51,8 @@ public class CardService {
         return new Card();
     }
 
-    public void saveCard(Card card, MultipartFile picture) throws IOException {
+    public void saveCard(User adminUser, Card card, MultipartFile picture) throws IOException {
+        validationService.validate(ValidationType.ADMIN, adminUser);
         String cardPictureRef = saveImage(picture);
         addPictureReferenceToCard(card,cardPictureRef);
         cardRepository.saveCard(card);
@@ -65,5 +72,11 @@ public class CardService {
     }
     private void addPictureReferenceToCard(Card card, String cardPictureRef) throws IOException {
         card.setPictureRef(cardPictureRef);
+    }
+    public void updateCard(User adminUser, Card card) {
+        validationService.validate(ValidationType.ADMIN, adminUser);
+    }
+    public void deleteCard(User adminUser, long id) {
+        validationService.validate(ValidationType.ADMIN, adminUser);
     }
 }
