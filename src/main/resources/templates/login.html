@@ -1,28 +1,51 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log ind</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>Log ind - Deckforge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div>
-    <div th:replace="~{fragments/navbar :: navbar}"></div>
-    <h1>Vær sød at logge ind</h1>
-    <form th:action="@{/login}" method="post">
-        <label for="email">Email:</label><br>
-        <input type="text" id="email" name="email" required><br><br>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br><br>
+<section class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Log ind</h1>
+            <p class="auth-subtitle">Velkommen tilbage</p>
+        </div>
 
-        <button type="submit">Log ind</button>
-        <a th:href="@{/register}" class="navbar-link navbar-link--accent">Register</a>
-    </form>
-</div>
-<h3> <a th:href="@{/}">Home</a></h3>
+        <form th:action="@{/login}" method="post">
+            <div class="form-field">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-input" type="text" id="email" name="email"
+                       placeholder="F.eks. bruger@gmail.com" required>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-input" type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Log ind</button>
+            </div>
+        </form>
+
+        <div class="auth-divider">Eller</div>
+
+        <div class="auth-footer">
+            <p>Har du ikke en konto? <a th:href="@{/register}">Opret konto</a></p>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-ornament">⚜ ✦ ⚜</div>
+        <p class="footer-text">Deckforge · Anno MMXXVI</p>
+    </div>
+</footer>
 </body>
 </html>

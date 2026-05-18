@@ -77,7 +77,7 @@ public class CollectionRepository implements ICollectionRepository {
 
     public void removeCardFromCollection(long cardId, long userId) {
         String sql = """
-            DELETE FROM Collections WHERE UserId = ? AND CardId = ?
+            DELETE FROM Collections WHERE UserId = ? AND CardId = ? LIMIT 1
         """;
         jdbc.update(sql, userId, cardId);
     }
