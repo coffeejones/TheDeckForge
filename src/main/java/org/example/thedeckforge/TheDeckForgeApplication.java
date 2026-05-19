@@ -1,5 +1,7 @@
 package org.example.thedeckforge;
 
+import org.example.thedeckforge.entity.Event;
+import org.example.thedeckforge.infrastructure.EventRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

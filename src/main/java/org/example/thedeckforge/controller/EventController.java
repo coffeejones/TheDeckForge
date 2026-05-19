@@ -1,9 +1,7 @@
 package org.example.thedeckforge.controller;
 
 import org.example.thedeckforge.entity.Event;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.example.thedeckforge.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/event")
+@RestController
+@RequestMapping("/api/events")
 public class EventController {
 
     private final EventService eventService;
@@ -36,9 +34,15 @@ public class EventController {
     }
 
     @PostMapping
+    public Event create(@RequestBody Event event) {
+        return eventService.createEvent(event);
+    }
+    
+    @PutMapping("/{id}")
     public Event update(@PathVariable long id, @RequestBody Event event) {
         return eventService.updateEvent(id, event);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id) {
         return eventService.deleteEvent(id)

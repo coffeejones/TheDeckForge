@@ -12,6 +12,20 @@ public class EventRepository implements IEventRepository {
 
     private final List<Event> events = new ArrayList<>();
 
+    public EventRepository() {
+        Event testEvent = new Event();
+
+        testEvent.setId(1);
+        testEvent.setName("friday draft");
+        testEvent.setDate("2028-05-20");
+        testEvent.setLocation("kaldung");
+        testEvent.setDescription("comp");
+
+        events.add(testEvent);
+        System.out.println("done");
+    }
+
+
     @Override
     public List<Event> findAll() {
         return events;

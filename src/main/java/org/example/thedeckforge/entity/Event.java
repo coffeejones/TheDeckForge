@@ -17,6 +17,11 @@ public class Event {
         this.description = description;
         this.participants = participants;
     }
+
+    public Event() {
+
+    }
+
     public long getId() {
         return id;
     }
