@@ -6,7 +6,6 @@ import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository
@@ -59,7 +58,7 @@ public class CollectionRepository implements ICollectionRepository {
         return count != null ? count : 0;
     }
 
-    public RowMapper<Card> cardRowMapper() {
+    private RowMapper<Card> cardRowMapper() {
         return (rs, rowNum) -> new Card(
                 rs.getLong("CardId"),
                 rs.getString("CharacterName"),

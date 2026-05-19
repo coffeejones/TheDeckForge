@@ -11,7 +11,6 @@ public interface ICollectionRepository {
     List<Card> findOwnedCardsByUserId(long userId);
     List<Card> findOwnedCardsByUserId(long userId, int page, int pageSize);
     int countOwnedCardsByUserId(long userId);
-    RowMapper<Card> cardRowMapper();
     boolean userHasCard(long userId, long cardId);
     void deleteCardFromCollectionReference(long cardId);
 }

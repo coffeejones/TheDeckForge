@@ -2,11 +2,10 @@ package org.example.thedeckforge.service;
 
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.User;
-import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
 import org.example.thedeckforge.infrastructure.CollectionRepository;
 import org.example.thedeckforge.infrastructure.UserRepository;
 import org.example.thedeckforge.validation.ValidationType;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,18 +15,12 @@ public class CollectionService {
 
     private final CollectionRepository collectionRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
     private final ValidationService validationService;
 
-    public CollectionService(CollectionRepository collectionRepository, UserRepository userRepository, UserService userService, ValidationService validationService) {
+    public CollectionService(CollectionRepository collectionRepository, UserRepository userRepository, ValidationService validationService) {
         this.collectionRepository = collectionRepository;
         this.userRepository = userRepository;
-        this.userService = userService;
         this.validationService = validationService;
-    }
-
-    public List<Card> getOwnedCards(long userId) {
-        return collectionRepository.findOwnedCardsByUserId(userId);
     }
 
     public List<Card> getOwnedCards(long userId, int page, int pageSize) {
@@ -38,18 +31,15 @@ public class CollectionService {
         return collectionRepository.countOwnedCardsByUserId(userId);
     }
 
-    public void addCardToCollection(Card card, Authentication auth) {
-        User user = userService.getCurrentUser(auth);
+    public void addCardToCollection(Card card, User user) {
         userRepository.addCardToCollection(user, card);
     }
 
-    public boolean userHadCard(Card card, Authentication auth) {
-        User user = userService.getCurrentUser(auth);
+    public boolean userHadCard(Card card, User user) {
         return collectionRepository.userHasCard(user.getId(), card.getId());
     }
 
-    public void removeCardFromCollection(Card card, Authentication auth) {
-        User user = userService.getCurrentUser(auth);
+    public void removeCardFromCollection(Card card, User user) {
         collectionRepository.removeCardFromCollection(card.getId(),user.getId());
     }
     public void deleteCardReferenceFromCollection(User adminUser,long cardId){

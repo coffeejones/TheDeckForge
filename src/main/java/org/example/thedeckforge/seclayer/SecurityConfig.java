@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .authenticationProvider(customAuthenticationProvider)
                 .authorizeHttpRequests(auth -> auth
                         // Offentligt
-                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/img/**", "/cards/**").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/img/**", "/cards/**", "/decks/**").permitAll()
 
                         // Kun ADMIN
                         .requestMatchers("/admin/**", "/cards/new", "/cards/*/edit").hasRole("ADMIN")
@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/events/new", "/events/*/results").hasRole("ORGANIZER")
 
                         // MEMBER eller højere (alle indloggede)
-                        .requestMatchers("/collection/**", "/decks/**", "/trades/**").hasRole("MEMBER")
+                        .requestMatchers("/collection/**", "/trades/**").hasRole("MEMBER")
 
                         .anyRequest().authenticated()
                 )

@@ -4,12 +4,10 @@ import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
-import org.example.thedeckforge.infrastructure.CollectionRepository;
 import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,5 +91,12 @@ public class CardService {
         collectionService.deleteCardReferenceFromCollection(adminUser, cardId);
         deckService.DeleteCardReferenceFromDeck(adminUser, cardId);
         cardRepository.deleteCard(cardId);
+    }
+
+    public Card getCardById(long id){
+
+        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
+
+        return cardRepository.returnCardById(criteria).orElseThrow(() -> new RuntimeException("Card with id " + id + " does not exist"));
     }
 }

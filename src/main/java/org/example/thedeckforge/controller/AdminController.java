@@ -4,7 +4,6 @@ import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.service.CardService;
-import org.example.thedeckforge.service.ObjectSearchCriteriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,12 +18,10 @@ import java.util.List;
 public class AdminController {
 
     private final CardService cardService;
-    private final ObjectSearchCriteriaService objectSearchCriteriaService;
 
     @Autowired
-    public AdminController(CardService cardService, ObjectSearchCriteriaService objectSearchCriteriaService) {
+    public AdminController(CardService cardService) {
         this.cardService = cardService;
-        this.objectSearchCriteriaService = objectSearchCriteriaService;
     }
     @GetMapping("/admin-panel")
     public String adminPanel(){

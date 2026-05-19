@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|${user.name} - Decks|">Decks</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<section class="collection-page">
+    <div class="container">
+
+        <header class="collection-header">
+            <span class="hero-eyebrow">✦ Deck Vault ✦</span>
+            <h1 th:text="|${user.name}'s decks|">Jonas's decks</h1>
+            <p class="section-subtitle" th:if="${not #lists.isEmpty(decks)}">
+                <strong th:text="${decks.size()}">0</strong> decks
+            </p>
+        </header>
+
+        <div th:if="${#lists.isEmpty(decks)}" class="collection-empty">
+            <div class="empty-ornament">✦</div>
+            <p>Ingen decks oprettet endnu.</p>
+            <a th:href="@{/decks/deck-creator}" class="btn btn-secondary">Opret et deck</a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(decks)}" class="collection-grid">
+            <a th:each="deck : ${decks}"
+               th:href="@{/decks/deck-editor/{name}(name=${deck.name})}"
+               class="collection-card">
+                <div class="collection-card-image" th:if="${deck.cards != null && !deck.cards.isEmpty()}">
+                    <img th:src="${deck.cards[0].pictureRef}" th:alt="${deck.name}">
+                </div>
+                <div class="collection-card-image" th:if="${deck.cards == null || deck.cards.isEmpty()}">
+                    <div style="width:100%;aspect-ratio:2.5/3.5;background:var(--violet);display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);color:var(--ink-muted);font-size:2rem;">⚜</div>
+                </div>
+                <div class="collection-card-name" th:text="${deck.name}">Deck Name</div>
+                <div style="color:var(--ink-muted);font-size:0.85rem;" th:text="${deck.format}">Standard</div>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-ornament">⚜ ✦ ⚜</div>
+        <p class="footer-text">Deckforge · Anno MMXXVI</p>
+    </div>
+</footer>
+
+</body>
+</html>

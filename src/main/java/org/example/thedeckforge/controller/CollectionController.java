@@ -4,10 +4,8 @@ import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.CollectionService;
-import org.example.thedeckforge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,14 +19,13 @@ public class CollectionController {
 
     private static final int PAGE_SIZE = 30;
 
-    private final UserService userService;
+
     private final CollectionService collectionService;
     private final CardService cardService;
 
     @Autowired
-    public CollectionController(CollectionService collectionService, UserService userService, CardService cardService) {
+    public CollectionController(CollectionService collectionService, CardService cardService) {
         this.collectionService = collectionService;
-        this.userService = userService;
         this.cardService = cardService;
     }
 
@@ -59,17 +56,17 @@ public class CollectionController {
 
     @PostMapping("/card-detail/{cardName}/remove")
     @ResponseBody
-    public ResponseEntity<String> removeCard(@PathVariable String cardName, Authentication auth) {
+    public ResponseEntity<String> removeCard(@PathVariable String cardName, @AuthenticationPrincipal User user) {
         Card card = cardService.getCardByName(cardName);
-        collectionService.removeCardFromCollection(card,auth);
+        collectionService.removeCardFromCollection(card,user);
         return ResponseEntity.ok("Kort fjernet");
     }
 
     @PostMapping("/card-detail/{cardName}/add")
     @ResponseBody
-    public ResponseEntity<String> addCard(@PathVariable String cardName, Authentication auth) {
+    public ResponseEntity<String> addCard(@PathVariable String cardName, @AuthenticationPrincipal User user) {
         Card card = cardService.getCardByName(cardName);
-        collectionService.addCardToCollection(card, auth);
+        collectionService.addCardToCollection(card, user);
         return ResponseEntity.ok("Kort tilføjet");
 
     }

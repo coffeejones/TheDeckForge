@@ -1,11 +1,12 @@
 package org.example.thedeckforge.controller;
 
 import org.example.thedeckforge.entity.Card;
+import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +38,10 @@ public class CardController {
         return "card-list";
     }
     @GetMapping("/card-detail/{cardName}")
-    public String cardDetail(@PathVariable String cardName, Model model, Authentication auth) {
+    public String cardDetail(@PathVariable String cardName, Model model, @AuthenticationPrincipal User user) {
         Card card = cardService.getCardByName(cardName);
         model.addAttribute("card", card);
-        model.addAttribute("hasCard", auth != null && collectionService.userHadCard(card, auth));
+        model.addAttribute("hasCard", user != null && collectionService.userHadCard(card, user));
         return "card-detail";
     }
 

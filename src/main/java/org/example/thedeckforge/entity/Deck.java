@@ -44,14 +44,22 @@ public class Deck {
     public void setCards(List<Card> cards) {
         this.cards = cards;
     }
-    public void removeCard(Card card){
-        this.cards.remove(card);
-    }
     public FormatType getFormat() {
         return format;
     }
     public void setFormat(FormatType format) {
         this.format = format;
     }
-
+    public void addCard(Card card){
+        this.cards.add(card);
+    }
+    public void removeCard(Card card){
+        for(Card c : cards){
+            if(c.getId() == card.getId()){
+                int index = cards.indexOf(c);
+                cards.remove(index);
+                break;
+            }
+        }
+    }
 }

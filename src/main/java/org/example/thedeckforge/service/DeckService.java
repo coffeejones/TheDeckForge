@@ -5,7 +5,7 @@ import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.example.thedeckforge.entity.interfaces.IDeckRepository;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;
-import org.example.thedeckforge.infrastructure.UserRepository;
+import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -15,14 +15,14 @@ import java.util.List;
 @Service
 public class DeckService {
     private final IDeckRepository deckRepository;
-    private final UserService userService;
+    private final ValidationService validationService;
     private final IUserRepository userRepository;
     private final ICardRepository cardRepository;
 
     @Autowired
-    public DeckService(IDeckRepository deckRepository, UserService userService, IUserRepository userRepository,  ICardRepository cardRepository) {
+    public DeckService(IDeckRepository deckRepository, ValidationService validationService, IUserRepository userRepository, ICardRepository cardRepository) {
         this.deckRepository = deckRepository;
-        this.userService = userService;
+        this.validationService = validationService;
         this.userRepository = userRepository;
         this.cardRepository = cardRepository;
     }
@@ -48,14 +48,33 @@ public class DeckService {
         for (Deck deck : user.getDecks()){
             if (deck.getName().equals(deckName)){
                 deck.removeCard(card);
-                deckRepository.removeDeckCard(deck,cardRepository.getCardId(card),userRepository.getUserId(user));
             }
         }
-
     }
-
     public List<Deck> getAllDecks(){
         return deckRepository.getAllDecks();
+    }
+
+    public void DeleteCardReferenceFromDeck(User adminUser, long cardId){
+        validationService.validate(ValidationType.ADMIN, adminUser);
+        deckRepository.deleteCardReferenceFromDeck(cardId);
+    }
+
+    public void addCardToDeck (String deckName, User user, Card card){
+        for (Deck deck : user.getDecks()) {
+            if (deck.getName().equals(deckName)) {
+                deck.addCard(card);
+            }
+        }
+    }
+
+    public void saveDeck(String deckName, User user){
+        ArrayList<Long> cardIds = new ArrayList<Long>();
+        Deck deck = user.getDeckFromName(deckName);
+        for (Card card : deck.getCards()) {
+            cardIds.add(cardRepository.getCardId(card));
+        }
+        deckRepository.saveDeck(cardIds, deck);
     }
 }
 

@@ -1,16 +1,16 @@
-package org.example.thedeckforge.infrastructure;
+package org.example.thedeckforge.infrastructure.sqlquerybuilders;
 
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.infrastructure.sqlquerybuilders.SQLQueryBuilder;
-import org.example.thedeckforge.infrastructure.sqlquerybuilders.SQLQueryFilterHelper;
+import org.example.thedeckforge.infrastructure.sqlquerybuilders.SQLQueryFilter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 @Component
 public class CardSQLQueryBuilder extends SQLQueryBuilder {
-    private final SQLQueryFilterHelper filter;
+    private final SQLQueryFilter filter;
 
-    public CardSQLQueryBuilder(SQLQueryFilterHelper filter) {
+    public CardSQLQueryBuilder(SQLQueryFilter filter) {
         this.filter = filter;
     }
 

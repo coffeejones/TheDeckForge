@@ -3,7 +3,7 @@ package org.example.thedeckforge.infrastructure.sqlquerybuilders;
 import org.springframework.stereotype.Component;
 import java.util.*;
 @Component
-public class SQLQueryFilterHelper {
+public class SQLQueryFilter {
     public void applyNameFilter(String name, String column, List<String> conditions, List<Object> params) {
         if (name != null && !name.isBlank()) {
             conditions.add("LOWER(" + column + ") LIKE ?");
