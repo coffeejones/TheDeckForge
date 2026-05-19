@@ -28,12 +28,14 @@ public class DeckService {
     }
 
     public void createDeck(Deck deck, User user){
+        validateUser(user);
         deck.setCards(new ArrayList<>());
         user.setDecks(new ArrayList<>());
         user.addDeck(deck);
         deckRepository.createUserDeck(deck,userRepository.getUserId(user));
     }
     public List<Deck> getUserDecks(User user){
+        validateUser(user);
         return cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
     }
     public Deck getDeckForm(){
@@ -45,6 +47,7 @@ public class DeckService {
     }
 
     public void removeCardFromDeck(String deckName, User user, Card card){
+        validateUser(user);
         for (Deck deck : user.getDecks()){
             if (deck.getName().equals(deckName)){
                 deck.removeCard(card);
@@ -69,12 +72,16 @@ public class DeckService {
     }
 
     public void saveDeck(String deckName, User user){
+        validateUser(user);
         ArrayList<Long> cardIds = new ArrayList<Long>();
         Deck deck = user.getDeckFromName(deckName);
         for (Card card : deck.getCards()) {
             cardIds.add(cardRepository.getCardId(card));
         }
         deckRepository.saveDeck(cardIds, deck);
+    }
+    private void validateUser(User user){
+        validationService.validate(ValidationType.USER,user);
     }
 }
 
