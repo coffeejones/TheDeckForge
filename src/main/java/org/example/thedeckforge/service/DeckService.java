@@ -1,4 +1,5 @@
 package org.example.thedeckforge.service;
+import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
@@ -13,33 +14,48 @@ import java.util.List;
 
 @Service
 public class DeckService {
-private final IDeckRepository deckRepository;
-private final UserService userService;
-private final IUserRepository userRepository;
-private final ICardRepository cardRepository;
+    private final IDeckRepository deckRepository;
+    private final UserService userService;
+    private final IUserRepository userRepository;
+    private final ICardRepository cardRepository;
 
-@Autowired
-public DeckService(IDeckRepository deckRepository, UserService userService, IUserRepository userRepository,  ICardRepository cardRepository) {
-    this.deckRepository = deckRepository;
-    this.userService = userService;
-    this.userRepository = userRepository;
-    this.cardRepository = cardRepository;
-}
+    @Autowired
+    public DeckService(IDeckRepository deckRepository, UserService userService, IUserRepository userRepository,  ICardRepository cardRepository) {
+        this.deckRepository = deckRepository;
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.cardRepository = cardRepository;
+    }
 
-public void createDeck(Deck deck, User user){
-    deck.setCards(new ArrayList<>());
-    user.addDeck(deck);
-
-    deckRepository.createUserDeck(deck,userRepository.getUserId(user));
-}
-public List<Deck> getUserDecks(User user){
-    return cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
-}
+    public void createDeck(Deck deck, User user){
+        deck.setCards(new ArrayList<>());
+        user.setDecks(new ArrayList<>());
+        user.addDeck(deck);
+        deckRepository.createUserDeck(deck,userRepository.getUserId(user));
+    }
+    public List<Deck> getUserDecks(User user){
+        return cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
+    }
     public Deck getDeckForm(){
         return new Deck();
     }
 
     public Deck getSpecificDeckFromUser(User user, String deckName){
-    return user.getDeckFromName(deckName);
+        return user.getDeckFromName(deckName);
+    }
+
+    public void removeCardFromDeck(String deckName, User user, Card card){
+        for (Deck deck : user.getDecks()){
+            if (deck.getName().equals(deckName)){
+                deck.removeCard(card);
+                deckRepository.removeDeckCard(deck,cardRepository.getCardId(card),userRepository.getUserId(user));
+            }
+        }
+
+    }
+
+    public List<Deck> getAllDecks(){
+        return deckRepository.getAllDecks();
     }
 }
+

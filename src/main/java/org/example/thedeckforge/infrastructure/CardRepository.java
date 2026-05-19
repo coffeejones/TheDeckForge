@@ -5,7 +5,6 @@ import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
-import org.example.thedeckforge.infrastructure.sqlquerybuilders.CardSQLQueryBuilder;
 import org.example.thedeckforge.infrastructure.sqlquerybuilders.SQLQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,10 +18,12 @@ import java.util.Optional;
 public class CardRepository implements ICardRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final CardSQLQueryBuilder cardSQLQueryBuilder;
+    private final SQLQueryBuilder criteriaBuilder;
+    private final org.example.thedeckforge.infrastructure.CardSQLQueryBuilder cardSQLQueryBuilder;
     @Autowired
-    public CardRepository(JdbcTemplate jdbcTemplate, CardSQLQueryBuilder cardSQLQueryBuilder) {
+    public CardRepository(JdbcTemplate jdbcTemplate, SQLQueryBuilder criteriaBuilder, org.example.thedeckforge.infrastructure.CardSQLQueryBuilder cardSQLQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.criteriaBuilder = criteriaBuilder;
         this.cardSQLQueryBuilder = cardSQLQueryBuilder;
     }
     @Override
@@ -89,30 +90,38 @@ public class CardRepository implements ICardRepository {
                 card.getManaCost(),
                 card.getAttack(),
                 card.getDefense()
-                );
+        );
     }
     @Override
     public List<Deck> getDecksCards(List<Deck> decks){
         String sqlDeckContentsQuery = "SELECT * FROM Cards LEFT JOIN DeckCards ON Cards.CardId = DeckCards.CardId WHERE DeckId = ?";
-        for (Deck deck : decks) {
-            List<Card> cards = new ArrayList<>(jdbcTemplate.query(sqlDeckContentsQuery, (rs, rowNum) ->
-                    new Card(
-                            rs.getLong("CardId"),
-                            rs.getString("CharacterName"),
-                            CardType.valueOf(rs.getString("CardType").toUpperCase()),
-                            rs.getString("Color"),
-                            rs.getString("CardSet"),
-                            rs.getString("Rarity"),
-                            rs.getString("RuleText"),
-                            rs.getString("PictureReference"),
-                            rs.getString("ManaCost"),
-                            rs.getInt("ATK"),
-                            rs.getInt("DEF")
-                    ), deck.getDeckId()
-            )
-            );
-            deck.setCards(cards);
+        if(decks!=null){
+            for (Deck deck : decks) {
+                List<Card> cards = new ArrayList<>(jdbcTemplate.query(sqlDeckContentsQuery, (rs, rowNum) ->
+                        new Card(
+                                rs.getLong("CardId"),
+                                rs.getString("CharacterName"),
+                                CardType.valueOf(rs.getString("CardType").toUpperCase()),
+                                rs.getString("Color"),
+                                rs.getString("CardSet"),
+                                rs.getString("Rarity"),
+                                rs.getString("RuleText"),
+                                rs.getString("PictureReference"),
+                                rs.getString("ManaCost"),
+                                rs.getInt("ATK"),
+                                rs.getInt("DEF")
+                        ), deck.getDeckId()
+                )
+                );
+                deck.setCards(cards);
+            }
+            return decks;
         }
-        return decks;
+        return null;
+    }
+    @Override
+    public long getCardId (Card card){
+        String sql = "Select CardId From Cards Where characterName = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("CardId"), card.getCardName());
     }
 }

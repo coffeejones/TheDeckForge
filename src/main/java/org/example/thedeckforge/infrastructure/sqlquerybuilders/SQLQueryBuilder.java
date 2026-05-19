@@ -1,7 +1,7 @@
 package org.example.thedeckforge.infrastructure.sqlquerybuilders;
 
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
-
+import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +13,8 @@ public abstract class SQLQueryBuilder {
         return buildFinalQuery(getBaseSQLQuery(), conditions);
     }
 
-    abstract String getBaseSQLQuery();
-
-    abstract void applyFilters(ObjectSearchCriteria criteria, List<String> conditions, List<Object> params);
+    protected abstract String getBaseSQLQuery();
+    protected abstract void applyFilters(ObjectSearchCriteria criteria, List<String> conditions, List<Object> params);
 
     private String buildFinalQuery(String baseQuery, List<String> conditions) {
         if (conditions.isEmpty()) {
