@@ -1,6 +1,7 @@
 package org.example.thedeckforge.controller;
 
 import org.example.thedeckforge.entity.Card;
+import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +30,15 @@ public class CardController {
         return "card-search";
     }
     @GetMapping("/card-list")
-    public String cardListController(@RequestParam String searchTerm, Model model){
-        List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm);
+    public String cardListController(@RequestParam String searchTerm, Model model, CardType cardType) {
+        List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm, cardType);
         model.addAttribute("searchResults", searchResults);
         model.addAttribute("searchTerm", searchTerm);
         return "card-list";
     }
-    @GetMapping("/card-detail/{id}")
-    public String cardDetail(@PathVariable long id, Model model, Authentication auth) {
-        Card card = cardService.getCardById(id);
+    @GetMapping("/card-detail/{cardName}")
+    public String cardDetail(@PathVariable String cardName, Model model, Authentication auth) {
+        Card card = cardService.getCardByName(cardName);
         model.addAttribute("card", card);
         model.addAttribute("hasCard", auth != null && collectionService.userHadCard(card, auth));
         return "card-detail";

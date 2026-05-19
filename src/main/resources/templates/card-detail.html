@@ -63,10 +63,10 @@
 
                 <div class="hero-actions" style="justify-content: flex-start; margin-top: var(--space-8);"
                      sec:authorize="isAuthenticated()">
-                    <form id="add-to-collection" th:action="@{/collection/card-detail/{id}/add(id=${card.id})}" method="post">
+                    <form id="add-to-collection" th:action="@{/collection/card-detail/{cardName}/add(cardName=${card.cardName})}" method="post">
                         <button type="submit" class="btn btn-secondary">Tilføj til samling</button>
                     </form>
-                    <form id="remove-from-collection" th:if="${hasCard}" th:action="@{/collection/card-detail/{id}/remove(id=${card.id})}" method="post">
+                    <form id="remove-from-collection" th:if="${hasCard}" th:action="@{/collection/card-detail/{cardName}/remove(cardName=${card.cardName})}" method="post">
                         <button type="submit" class="btn btn-secondary">Fjern kort fra samling</button>
                     </form>
                     <button type="button" class="btn btn-secondary">Tilføj til deck</button>
@@ -86,6 +86,12 @@
 </footer>
 
 <script>
+    var pendingToast = sessionStorage.getItem('toastMessage');
+    if (pendingToast) {
+        sessionStorage.removeItem('toastMessage');
+        showToast(pendingToast);
+    }
+
     function setupForm(id, successMessage) {
         var form = document.getElementById(id);
         if (!form) return;
@@ -97,8 +103,10 @@
             headers[csrfHeader] = csrfToken;
             fetch(this.action, { method: 'POST', headers: headers })
                 .then(function(response) {
-                    if (response.ok) showToast(successMessage);
-                    else showToast('Noget gik galt.');
+                    if (response.ok) {
+                        sessionStorage.setItem('toastMessage', successMessage);
+                        window.location.reload();
+                    } else showToast('Noget gik galt.');
                 });
         });
     }

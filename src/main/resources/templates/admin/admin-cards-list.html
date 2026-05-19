@@ -22,11 +22,19 @@
             </p>
         </header>
 
-        <form class="search-bar" th:action="@{/cards/card-list}" method="get">
+        <form class="search-bar" th:action="@{/admin/admin-card-list}" method="get">
             <input type="text" name="searchTerm"
                    class="form-input"
                    placeholder="Søg igen..."
                    th:value="${param.searchTerm}">
+            <select name="cardType" class="form-input">
+                <option value="">Alle typer</option>
+                <option th:each="type : ${cardTypes}"
+                        th:value="${type}"
+                        th:text="${type}"
+                        th:selected="${param.cardType == type.name()}">
+                </option>
+            </select>
             <button type="submit" class="btn btn-primary">Søg</button>
         </form>
 
@@ -38,7 +46,7 @@
 
         <div th:unless="${#lists.isEmpty(searchResults)}" class="collection-grid">
             <a th:each="card : ${searchResults}"
-               th:href="@{/cards/card-detail/{cardName}(cardName=${card.cardName})}"
+               th:href="@{/admin/admin-card-detail/{cardName}(cardName=${card.cardName})}"
                class="collection-card">
                 <div class="collection-card-image">
                     <img th:src="${card.pictureRef}" th:alt="${card.cardName}">

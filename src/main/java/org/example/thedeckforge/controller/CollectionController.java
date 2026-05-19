@@ -8,6 +8,7 @@ import org.example.thedeckforge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,12 +33,7 @@ public class CollectionController {
     }
 
     @GetMapping
-    public String viewCollection(Authentication auth, @RequestParam(defaultValue = "0") int page, Model model) {
-
-        User user = userService.getCurrentUser(auth);
-        if (user == null) {
-            return "redirect:/login";
-        }
+    public String viewCollection(@AuthenticationPrincipal User user, @RequestParam(defaultValue = "0") int page, Model model) {
 
         int totalCards = collectionService.countOwnedCards(user.getId());
         int totalPages = Math.max(1, (int) Math.ceil((double) totalCards / PAGE_SIZE));
@@ -61,18 +57,18 @@ public class CollectionController {
         return "collection/view";
     }
 
-    @PostMapping("/card-detail/{id}/remove")
+    @PostMapping("/card-detail/{cardName}/remove")
     @ResponseBody
-    public ResponseEntity<String> removeCard(@PathVariable long id, Authentication auth) {
-        Card card = cardService.getCardById(id);
+    public ResponseEntity<String> removeCard(@PathVariable String cardName, Authentication auth) {
+        Card card = cardService.getCardByName(cardName);
         collectionService.removeCardFromCollection(card,auth);
         return ResponseEntity.ok("Kort fjernet");
     }
 
-    @PostMapping("/card-detail/{id}/add")
+    @PostMapping("/card-detail/{cardName}/add")
     @ResponseBody
-    public ResponseEntity<String> addCard(@PathVariable long id, Authentication auth) {
-        Card card = cardService.getCardById(id);
+    public ResponseEntity<String> addCard(@PathVariable String cardName, Authentication auth) {
+        Card card = cardService.getCardByName(cardName);
         collectionService.addCardToCollection(card, auth);
         return ResponseEntity.ok("Kort tilføjet");
 

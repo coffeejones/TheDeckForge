@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kort — Deckforge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<form th:action="@{/admin/admin-card-detail}" th:object="${card}" method="post" enctype="multipart/form-data">
+    <input type="hidden" th:field="*{id}"/>
+    <div class="field">
+        <label for="cardName">Card Name</label>
+        <input type="text" id="cardName" name="cardName" th:field="*{cardName}" th:placeholder="${card.cardName}" >
+    </div>
+    <div class="field">
+        <label>
+            <select th:field="*{cardType}">
+                <option value="">Select Type</option>
+                <option th:each="type : ${cardTypes}"
+                        th:value="${type}"
+                        th:text="${type}"
+                        th:selected="${type == card.cardType}">
+                </option>
+            </select>
+        </label>
+    </div>
+    <div class="field">
+        <label for="color">Card Color</label>
+        <input type="text" id="color" name="cardColor" th:field="*{color}" th:placeholder="${card.color}" >
+    </div>
+    <div class="field">
+        <label for="set">Card Set</label>
+        <input type="text" id="set" name="cardSet" th:field="*{set}" th:placeholder="${card.set}" >
+    </div>
+    <div class="field">
+        <label for="rarity">rarity</label>
+        <input type="text" id="rarity" name="cardRarity" th:field="*{rarity}" th:placeholder="${card.rarity}" >
+    </div>
+    <div class="field">
+        <label for="ruleText">Description</label>
+        <input type="text" id="ruleText" name="cardRuleText" th:field="*{ruleText}" th:placeholder="${card.ruleText}" >
+    </div>
+    <div class="field">
+        <input type="hidden" th:field="*{pictureRef}"/>
+        <div class="field">
+            <label for="picture">Card Image</label>
+            <input type="file" id="picture" name="picture" accept="image/*">
+            <div th:if="${card.pictureRef != null and !card.pictureRef.isEmpty()}">
+                <p>Nuværende billede:</p>
+                <img th:src="${card.pictureRef}" th:alt="${card.cardName}" style="max-width: 200px;">
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <label for="manaCost">Card Mana Cost</label>
+        <input type="text" id="manaCost" name="cardManaCost" th:field="*{manaCost}" th:placeholder="${card.manaCost}" >
+    </div>
+    <div class="field">
+        <label for="attack">Card Attack Value</label>
+        <input type="text" id="attack" name="cardAttack" th:field="*{attack}" th:placeholder="${card.attack}">
+    </div>
+    <div class="field">
+        <label for="defense">Card Defense Value</label>
+        <input type="text" id="defense" name="cardDefense" th:field="*{defense}" th:placeholder="${card.defense}">
+    </div>
+    <div class="button">
+        <button type="submit">Save Card</button>
+    </div>
+</form>
+<form th:action="@{/admin/admin-card-delete/{id}(id=${card.id})}" method="post">
+    <input type="hidden" name="_method" value="delete">
+    <button type="submit" class="btn btn-danger">Slet Kort</button>
+</form>
+</body>
+</html>

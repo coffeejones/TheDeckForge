@@ -22,4 +22,7 @@ public class UserService {
         }
         return (User) authentication.getPrincipal();
     }
+    public User getUserForm(){
+        return new User();
+    }
 }

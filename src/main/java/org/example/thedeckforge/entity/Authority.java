@@ -20,12 +20,16 @@ public class Authority implements UserDetails {
         this.roles = roles;
     }
     public Authority() {}
-    public void setEmail(String email) {
-        this.email = email;
-    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + roles.name()));
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
     @Override
     public String getUsername() {

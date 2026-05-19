@@ -31,7 +31,7 @@
 
         <div th:unless="${user.collection.cards.isEmpty()}" class="collection-grid">
             <a th:each="card : ${user.collection.cards}"
-               th:href="@{/cards/card-detail/{id}(id=${card.id})}"
+               th:href="@{/cards/card-detail/{cardName}(cardName=${card.cardName})}"
                class="collection-card">
                 <div class="collection-card-image">
                     <img th:src="${card.pictureRef}" th:alt="${card.cardName}">

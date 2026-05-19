@@ -3,8 +3,9 @@ package org.example.thedeckforge.validation;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.Roles;
 import org.example.thedeckforge.validation.exceptions.ValidationException;
+import org.springframework.stereotype.Component;
 
-
+@Component("ADMIN")
 public class AdminValidation implements ValidationStrategy{
     @Override
     public ValidationType getValidationType() {

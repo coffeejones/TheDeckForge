@@ -22,7 +22,7 @@ create table Users (
 );
 create table Cards (
                        CardId BIGINT AUTO_INCREMENT PRIMARY KEY,
-                       CharacterName VARCHAR(100),
+                       CharacterName VARCHAR(100) UNIQUE,
                        CardType VARCHAR(50),
                        Color VARCHAR(50),
                        CardSet VARCHAR(100),

@@ -1,11 +1,17 @@
 package org.example.thedeckforge.infrastructure;
 
 import org.example.thedeckforge.entity.Card;
+import org.example.thedeckforge.entity.Deck;
+import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
+import org.example.thedeckforge.infrastructure.sqlquerybuilders.CardSQLQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,57 +19,25 @@ import java.util.Optional;
 public class CardRepository implements ICardRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final CardSQLQueryBuilder cardSQLQueryBuilder;
     @Autowired
-    public CardRepository(JdbcTemplate jdbcTemplate) {
+    public CardRepository(JdbcTemplate jdbcTemplate, CardSQLQueryBuilder cardSQLQueryBuilder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.cardSQLQueryBuilder = cardSQLQueryBuilder;
     }
     @Override
-    public void populateCardList() {
-    }
-    @Override
-    public List<Card> returnCardList() {
-        return List.of();
-    }
-    @Override
-    public List<Card> returnCardListByName(String searchCriteria) {
-        String sqlQuery = "SELECT * FROM Cards WHERE CharacterName LIKE ?";
-        return jdbcTemplate.query(sqlQuery,(rs, rowNum) ->
-                new Card(
-                        rs.getLong("CardId"),
-                        rs.getString("CharacterName"),
-                        CardType.valueOf(rs.getString("CardType").toUpperCase()),
-                        rs.getString("Color"),
-                        rs.getString("CardSet"),
-                        rs.getString("Rarity"),
-                        rs.getString("RuleText"),
-                        rs.getString("PictureReference"),
-                        rs.getString("ManaCost"),
-                        rs.getInt("ATK"),
-                        rs.getInt("DEF")
-                ), searchCriteria
+    public List<Card> returnCardListByName(ObjectSearchCriteria criteria) {
+        List<Object> params = new ArrayList<>(); // Ai anvendt, Object bliver brugt siden listen af ting vi gerne vil søge efter kan bestå af flere ting som både String og enums.
+        String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
+        return jdbcTemplate.query(sqlQuery, cardRowMapper(), params.toArray()
         );
     }
     @Override
-    public Optional<Card> returnCardById(long id) {
-        String sqlQuery = "SELECT * FROM Cards WHERE CardId = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) ->
-                new Card(rs.getLong("CardId"),
-                        rs.getString("CharacterName"),
-                        CardType.valueOf(rs.getString("CardType").toUpperCase()),
-                        rs.getString("Color"),
-                        rs.getString("CardSet"),
-                        rs.getString("Rarity"),
-                        rs.getString("RuleText"),
-                        rs.getString("PictureReference"),
-                        rs.getString("ManaCost"),
-                        rs.getInt("ATK"),
-                        rs.getInt("DEF")
-                ), id
-        ));
-    }
-    @Override
-    public Optional<Card> returnCardByName(String name) {
-        return Optional.empty();
+    public Optional<Card> returnCardByName(ObjectSearchCriteria criteria) {
+        List<Object> params = new ArrayList<>();
+        String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
+        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, cardRowMapper(), params.toArray())
+        );
     }
     @Override
     public void saveCard(Card card) {
@@ -80,5 +54,54 @@ public class CardRepository implements ICardRepository {
                 card.getAttack(),
                 card.getDefense()
                 );
+    }
+
+    @Override
+    public void updateCard(Card card) {
+        String sqlQuery = "UPDATE Cards SET CharacterName = ?, CardType = ?, Color = ?, CardSet = ?, Rarity = ?, RuleText = ?, PictureReference = ?, ManaCost = ?, ATK = ?, DEF = ? WHERE CardId = ?";
+        jdbcTemplate.update(sqlQuery,
+                card.getCardName(),
+                card.getCardType().toString(),
+                card.getColor(),
+                card.getSet(),
+                card.getRarity(),
+                card.getRuleText(),
+                card.getPictureRef(),
+                card.getManaCost(),
+                card.getAttack(),
+                card.getDefense(),
+                card.getId()
+        );
+    }
+
+    @Override
+    public void deleteCard(long cardId) {
+        String sqlQuery = "DELETE FROM Cards WHERE CardId = ?";
+        jdbcTemplate.update(sqlQuery, cardId);
+    }
+
+    @Override
+    public List<Deck> getDecksCards(List<Deck> decks){
+        String sqlDeckContentsQuery = "SELECT * FROM Cards LEFT JOIN DeckCards ON Cards.CardId = DeckCards.CardId WHERE DeckId = ?";
+        for (Deck deck : decks) {
+            List<Card> cards = new ArrayList<>(jdbcTemplate.query(sqlDeckContentsQuery, cardRowMapper(), deck.getDeckId()));
+            deck.setCards(cards);
+        }
+        return decks;
+    }
+    private RowMapper<Card> cardRowMapper() {
+        return (rs, rowNum) -> new Card(
+                rs.getLong("CardId"),
+                rs.getString("CharacterName"),
+                CardType.valueOf(rs.getString("CardType").toUpperCase()),
+                rs.getString("Color"),
+                rs.getString("CardSet"),
+                rs.getString("Rarity"),
+                rs.getString("RuleText"),
+                rs.getString("PictureReference"),
+                rs.getString("ManaCost"),
+                rs.getInt("ATK"),
+                rs.getInt("DEF")
+        );
     }
 }
