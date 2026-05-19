@@ -38,4 +38,9 @@ public class DeckRepository implements IDeckRepository {
         }
         return null;
     }
+    @Override
+    public void deleteCardReferenceFromDeck(long id){
+        String sqlQuery = "DELETE FROM DeckCards WHERE CardId = ?";
+        jdbcTemplate.update(sqlQuery,id);
+    }
 }

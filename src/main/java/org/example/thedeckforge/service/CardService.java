@@ -4,6 +4,7 @@ import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
+import org.example.thedeckforge.infrastructure.CollectionRepository;
 import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,16 @@ import java.util.List;
 @Service
 public class CardService {
     private final ICardRepository cardRepository;
+    private final CollectionService collectionService;
+    private final DeckService deckService;
     private final ObjectSearchCriteriaService objectSearchCriteriaService;
     private final ValidationService validationService;
 
     @Autowired
-    public CardService(ICardRepository cardRepository, ObjectSearchCriteriaService objectSearchCriteriaService, ValidationService validationService) {
+    public CardService(ICardRepository cardRepository, CollectionService collectionService, DeckService deckService, ObjectSearchCriteriaService objectSearchCriteriaService, ValidationService validationService) {
         this.cardRepository = cardRepository;
+        this.collectionService = collectionService;
+        this.deckService = deckService;
         this.objectSearchCriteriaService = objectSearchCriteriaService;
         this.validationService = validationService;
     }
@@ -70,13 +75,23 @@ public class CardService {
         }
         return null;
     }
-    private void addPictureReferenceToCard(Card card, String cardPictureRef) throws IOException {
+    private void addPictureReferenceToCard(Card card, String cardPictureRef) {
         card.setPictureRef(cardPictureRef);
     }
-    public void updateCard(User adminUser, Card card) {
+
+    public void updateCard(User adminUser, Card card, MultipartFile picture) throws IOException {
         validationService.validate(ValidationType.ADMIN, adminUser);
+        if (picture != null && !picture.isEmpty()) {
+            String cardPictureRef = saveImage(picture);
+            card.setPictureRef(cardPictureRef);
+        }
+        cardRepository.updateCard(card);
     }
-    public void deleteCard(User adminUser, long id) {
+
+    public void deleteCard(User adminUser, long cardId) {
         validationService.validate(ValidationType.ADMIN, adminUser);
+        collectionService.deleteCardReferenceFromCollection(adminUser, cardId);
+        deckService.DeleteCardReferenceFromDeck(adminUser, cardId);
+        cardRepository.deleteCard(cardId);
     }
 }

@@ -8,7 +8,9 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <form th:action="@{/admin/admin-card-detail}" th:object="${card}" method="post" enctype="multipart/form-data">
+    <input type="hidden" th:field="*{id}"/>
     <div class="field">
         <label for="cardName">Card Name</label>
         <input type="text" id="cardName" name="cardName" th:field="*{cardName}" th:placeholder="${card.cardName}" >
@@ -42,12 +44,14 @@
         <input type="text" id="ruleText" name="cardRuleText" th:field="*{ruleText}" th:placeholder="${card.ruleText}" >
     </div>
     <div class="field">
-        <label for="pictureRef">Card Image</label>
-        <input type="file" id="pictureRef" name="cardImage" accept="image/*">
-        <div th:if="${card.pictureRef != null and !card.pictureRef.isEmpty()}">
-            <p>Nuværende billede:</p>
-            <img th:src="${card.pictureRef}" th:alt="${card.cardName}" style="max-width: 200px;">
-            <p th:text="${card.pictureRef}">path/to/image</p>
+        <input type="hidden" th:field="*{pictureRef}"/>
+        <div class="field">
+            <label for="picture">Card Image</label>
+            <input type="file" id="picture" name="picture" accept="image/*">
+            <div th:if="${card.pictureRef != null and !card.pictureRef.isEmpty()}">
+                <p>Nuværende billede:</p>
+                <img th:src="${card.pictureRef}" th:alt="${card.cardName}" style="max-width: 200px;">
+            </div>
         </div>
     </div>
     <div class="field">

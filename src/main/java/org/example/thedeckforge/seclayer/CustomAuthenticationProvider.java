@@ -31,13 +31,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = Objects.requireNonNull(authentication.getCredentials()).toString();
-        System.out.println(">>> Email received: '" + email + "'");
         Authority userAuthority = logInService.getAuthorityFromEmail(email);
         if (!passwordEncoder.matches(password, userAuthority.getPassword())) {
             throw new BadCredentialsException("Invalid username or password");
         }
         User user = logInService.getUserFromAuthority(userAuthority);
-        System.out.println(user.getId());
         return new UsernamePasswordAuthenticationToken(user,null,user.getAuthority().getAuthorities());
     }
 

@@ -48,7 +48,7 @@ public class AdminController {
         model.addAttribute("cardTypes", CardType.values());
         List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm,cardType);
         model.addAttribute("searchResults", searchResults);
-        return "admin/admin-list-cards";
+        return "admin/admin-cards-list";
     }
     @GetMapping("/admin-card-detail/{cardName}")
     public String adminCardDetail(@PathVariable String cardName, Model model) {
@@ -58,13 +58,13 @@ public class AdminController {
         return "admin/admin-card-detail";
     }
     @PostMapping("/admin-card-detail")
-    public String cardEdit(@AuthenticationPrincipal User adminUser, @ModelAttribute("card") Card card) {
-        cardService.updateCard(adminUser, card);
-        return "redirect:/admin/admin-card-detail/" + card.getId();
+    public String cardEdit(@AuthenticationPrincipal User adminUser, @ModelAttribute("card") Card card, @RequestParam("picture") MultipartFile picture) throws IOException {
+        cardService.updateCard(adminUser, card, picture);
+        return "redirect:/admin/admin-card-detail/" + card.getCardName();
     }
-    @PostMapping("/admin-card-delete/{id}")
-    public String deleteCard(@AuthenticationPrincipal User adminUser, @PathVariable long id) {
-        cardService.deleteCard(adminUser, id);
+    @PostMapping("/admin-card-delete/{cardId}")
+    public String deleteCard(@AuthenticationPrincipal User adminUser, @PathVariable long cardId) {
+        cardService.deleteCard(adminUser, cardId);
         return "redirect:/admin/admin-card-list";
     }
 }

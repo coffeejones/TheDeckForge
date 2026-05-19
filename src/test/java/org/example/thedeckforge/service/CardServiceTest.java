@@ -1,44 +1,140 @@
 package org.example.thedeckforge.service;
 
+import org.example.thedeckforge.entity.Authority;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
-import org.example.thedeckforge.entity.interfaces.ICardRepository;
-import org.example.thedeckforge.validation.exceptions.CardValidationException;
+import org.example.thedeckforge.entity.User;
+import org.example.thedeckforge.entity.enums.CardType;
+import org.example.thedeckforge.entity.enums.Roles;
+import org.example.thedeckforge.validation.exceptions.ValidationException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
+
 @SpringBootTest
 @Transactional
+@Sql(scripts = {"/schema.sql", "/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CardServiceTest {
+    @Autowired
+    private CardService cardService;
 
-    private ICardRepository cardRepository;
+    @Autowired
     private ObjectSearchCriteriaService objectSearchCriteriaService;
 
+    private User getAdminUser() {
+        Authority adminAuthority = new Authority("admin@deckforge.com", "Password123!", Roles.ADMIN);
+        return new User("Admin Account", LocalDate.of(1995, 2, 1), adminAuthority);
+    }
 
     @Test
-    public void returnEmptyCardListTestBasedOnCriteria(){
-        ObjectSearchCriteria criteria = new ObjectSearchCriteria();
-        criteria.setObjectName("Booby");
-        List<Card> cardResult = cardRepository.returnCardListByName(criteria);
-        Assertions.assertTrue(cardResult.isEmpty());
-    }
-    @Test
-    public void returnCardByIdTest() {
-        Long id = 1L;
-        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
+    void getCardListOnSearchTerm() {
+        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria("goblin", CardType.CREATURE);
 
-        Optional<Card> cardResult = cardRepository.returnCardByName(criteria);
-        Assertions.assertTrue(cardResult.isPresent());
+        List<Card> cards = cardService.getCardListOnSearchTerm(criteria);
+
+        Assertions.assertFalse(cards.isEmpty());
+        Assertions.assertEquals(3, cards.size());
+    }
+
+    @Test
+    void getCardListBasedOnSearchTerm() {
+        List<Card> cards = cardService.getCardListBasedOnSearchTerm("goblin", CardType.CREATURE);
+        Assertions.assertFalse(cards.isEmpty());
+        Assertions.assertEquals(3, cards.size());
+    }
+
+    @Test
+    void getCardByName() {
+        Card card = cardService.getCardByName("Soul Warden");
+        Assertions.assertNotNull(card);
+        Assertions.assertEquals("Soul Warden", card.getCardName());
+    }
+
+    @Test
+    void createDefaultCard() {
+        Card card = cardService.createDefaultCard();
+
+        Assertions.assertNotNull(card);
+        Assertions.assertNull(card.getCardName());
+    }
+
+    @Test
+    void saveCard() throws IOException {
+        User adminUser = getAdminUser();
+        Card card = new Card("Black Lotus", CardType.ARTIFACT, "Gray",
+                "Alpha", "Mythic", "Add three mana of any single color.",
+                "/img/cards/black_lotus.jpg", "{0}", 0, 0);
+
+        MockMultipartFile emptyPicture = new MockMultipartFile("picture", new byte[0]);
+
+        cardService.saveCard(adminUser, card, emptyPicture);
+
+        Card saved = cardService.getCardByName("Black Lotus");
+        Assertions.assertNotNull(saved);
+        Assertions.assertEquals("Black Lotus", saved.getCardName());
+        Assertions.assertEquals(CardType.ARTIFACT, saved.getCardType());
+    }
+
+    @Test
+    void saveCard_throwsException_whenUserIsNotAdmin() {
+        Authority memberAuthority = new Authority("alice@example.com", "Password123!", Roles.MEMBER);
+        User memberUser = new User("Alice Johnson", LocalDate.of(2000, 7, 12), memberAuthority);
+        Card card = cardService.createDefaultCard();
+        MockMultipartFile emptyPicture = new MockMultipartFile("picture", new byte[0]);
+
+        Assertions.assertThrows(ValidationException.class,
+                () -> cardService.saveCard(memberUser, card, emptyPicture));
     }
     @Test
-    public void returnCardByIdFailTest() {
-        Long id = 1000L;
-        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
-        Optional<Card> cardResult = cardRepository.returnCardByName(criteria);
-        Assertions.assertFalse(cardResult.isPresent());
+    void updateCard() throws IOException {
+        User adminUser = getAdminUser();
+        Card card = cardService.getCardByName("Soul Warden");
+        card.setRarity("Rare"); // was Common in data.sql
+        MockMultipartFile emptyPicture = new MockMultipartFile("picture", new byte[0]);
+
+        cardService.updateCard(adminUser, card, emptyPicture);
+
+        Card updated = cardService.getCardByName("Soul Warden");
+        Assertions.assertEquals("Rare", updated.getRarity());
+    }
+
+    @Test
+    void updateCard_throwsException_whenUserIsNotAdmin() {
+        Authority memberAuthority = new Authority("alice@example.com", "Password123!", Roles.MEMBER);
+        User memberUser = new User("Alice Johnson", LocalDate.of(2000, 7, 12), memberAuthority);
+        Card card = cardService.getCardByName("Soul Warden");
+        MockMultipartFile emptyPicture = new MockMultipartFile("picture", new byte[0]);
+
+        Assertions.assertThrows(ValidationException.class,
+                () -> cardService.updateCard(memberUser, card, emptyPicture));
+    }
+
+    @Test
+    void deleteCard() {
+        User adminUser = getAdminUser();
+        Card card = cardService.getCardByName("Soul Warden");
+
+        cardService.deleteCard(adminUser, card.getId());
+
+        Assertions.assertThrows(RuntimeException.class,
+                () -> cardService.getCardByName("Soul Warden"));
+    }
+    @Test
+    void deleteCard_throwsException_whenUserIsNotAdmin() {
+        Authority memberAuthority = new Authority("alice@example.com", "Password123!", Roles.MEMBER);
+        User memberUser = new User("Alice Johnson", LocalDate.of(2000, 7, 12), memberAuthority);
+        Card card = cardService.getCardByName("Soul Warden");
+
+        Assertions.assertThrows(ValidationException.class,
+                () -> cardService.deleteCard(memberUser, card.getId()));
     }
 }

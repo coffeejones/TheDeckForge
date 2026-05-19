@@ -4,7 +4,7 @@ import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.example.thedeckforge.entity.interfaces.IDeckRepository;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;
-import org.example.thedeckforge.infrastructure.UserRepository;
+import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -14,13 +14,15 @@ import java.util.List;
 @Service
 public class DeckService {
 private final IDeckRepository deckRepository;
+private final ValidationService validationService;
 private final UserService userService;
 private final IUserRepository userRepository;
 private final ICardRepository cardRepository;
 
 @Autowired
-public DeckService(IDeckRepository deckRepository, UserService userService, IUserRepository userRepository,  ICardRepository cardRepository) {
+public DeckService(IDeckRepository deckRepository, UserService userService, ValidationService validationService, IUserRepository userRepository, ICardRepository cardRepository) {
     this.deckRepository = deckRepository;
+    this.validationService = validationService;
     this.userService = userService;
     this.userRepository = userRepository;
     this.cardRepository = cardRepository;
@@ -41,5 +43,10 @@ public List<Deck> getUserDecks(User user){
 
     public Deck getSpecificDeckFromUser(User user, String deckName){
     return user.getDeckFromName(deckName);
+    }
+
+    public void DeleteCardReferenceFromDeck(User adminUser, long cardId){
+        validationService.validate(ValidationType.ADMIN, adminUser);
+        deckRepository.deleteCardReferenceFromDeck(cardId);
     }
 }

@@ -14,7 +14,7 @@ public interface ICardRepository {
     Optional<Card> returnCardByName(ObjectSearchCriteria criteria);
     void saveCard(Card card);
     void updateCard(Card card);
-    void deleteCard(Card card);
+    void deleteCard(long cardId);
     List<Deck> getDecksCards(List<Deck> decks);
 
 }
