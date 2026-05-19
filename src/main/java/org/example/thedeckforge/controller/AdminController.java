@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -31,6 +30,7 @@ public class AdminController {
     public String adminPanel(){
         return "admin/admin-panel";
     }
+
     @GetMapping("/create-card-form")
     public String createCardForm(Model model) {
         model.addAttribute("Card",cardService.createDefaultCard());
@@ -48,11 +48,11 @@ public class AdminController {
         model.addAttribute("cardTypes", CardType.values());
         List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm,cardType);
         model.addAttribute("searchResults", searchResults);
-        return  "admin/list-cards";
+        return "admin/admin-list-cards";
     }
-    @GetMapping("/admin-card-detail/{id}")
-    public String adminCardDetail(@PathVariable long id, Model model) {
-        Card card = cardService.getCardById(id);
+    @GetMapping("/admin-card-detail/{cardName}")
+    public String adminCardDetail(@PathVariable String cardName, Model model) {
+        Card card = cardService.getCardByName(cardName);
         model.addAttribute("card", card);
         model.addAttribute("cardTypes", CardType.values());
         return "admin/admin-card-detail";

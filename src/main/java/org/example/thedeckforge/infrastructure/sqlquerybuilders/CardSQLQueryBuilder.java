@@ -7,9 +7,9 @@ import java.util.List;
 @Component
 public class CardSQLQueryBuilder extends SQLQueryBuilder {
 
-    private final SQLQueryFilterHelper filter;
+    private final SQLQueryFilter filter;
 
-    public CardSQLQueryBuilder(SQLQueryFilterHelper filter) {
+    public CardSQLQueryBuilder(SQLQueryFilter filter) {
         this.filter = filter;
     }
 

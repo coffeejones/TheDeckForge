@@ -63,10 +63,10 @@
 
                 <div class="hero-actions" style="justify-content: flex-start; margin-top: var(--space-8);"
                      sec:authorize="isAuthenticated()">
-                    <form id="add-to-collection" th:action="@{/collection/card-detail/{id}/add(id=${card.id})}" method="post">
+                    <form id="add-to-collection" th:action="@{/collection/card-detail/{cardName}/add(cardName=${card.cardName})}" method="post">
                         <button type="submit" class="btn btn-secondary">Tilføj til samling</button>
                     </form>
-                    <form id="remove-from-collection" th:if="${hasCard}" th:action="@{/collection/card-detail/{id}/remove(id=${card.id})}" method="post">
+                    <form id="remove-from-collection" th:if="${hasCard}" th:action="@{/collection/card-detail/{cardName}/remove(cardName=${card.cardName})}" method="post">
                         <button type="submit" class="btn btn-secondary">Fjern kort fra samling</button>
                     </form>
                     <button type="button" class="btn btn-secondary">Tilføj til deck</button>

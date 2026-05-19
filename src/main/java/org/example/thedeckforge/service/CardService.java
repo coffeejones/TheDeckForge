@@ -40,11 +40,11 @@ public class CardService {
         return cardRepository.returnCardListByName(criteria);
     }
 
-    public Card getCardById(long id){
+    public Card getCardByName(String cardName){
 
-        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
+        ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(cardName);
 
-        return cardRepository.returnCardById(criteria).orElseThrow(() -> new RuntimeException("Card with id " + id + " does not exist"));
+        return cardRepository.returnCardByName(criteria).orElseThrow(() -> new RuntimeException("Card with id " + cardName + " does not exist"));
     }
 
     public Card createDefaultCard(){

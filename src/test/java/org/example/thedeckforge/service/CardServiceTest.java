@@ -18,19 +18,7 @@ class CardServiceTest {
     private ICardRepository cardRepository;
     private ObjectSearchCriteriaService objectSearchCriteriaService;
 
-    @BeforeEach
-    public void setUp(){
-        cardRepository.populateCardList();
-    }
 
-    @Test
-    public void returnCardListTest() {
-        List<Card> cardResult = cardRepository.returnCardList();
-
-        Assertions.assertNotNull(cardResult);
-        Assertions.assertFalse(cardResult.isEmpty());
-        Assertions.assertEquals(2, cardResult.size());
-    }
     @Test
     public void returnEmptyCardListTestBasedOnCriteria(){
         ObjectSearchCriteria criteria = new ObjectSearchCriteria();
@@ -43,26 +31,14 @@ class CardServiceTest {
         Long id = 1L;
         ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
 
-        Optional<Card> cardResult = cardRepository.returnCardById(criteria);
+        Optional<Card> cardResult = cardRepository.returnCardByName(criteria);
         Assertions.assertTrue(cardResult.isPresent());
     }
     @Test
     public void returnCardByIdFailTest() {
         Long id = 1000L;
         ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
-        Optional<Card> cardResult = cardRepository.returnCardById(criteria);
+        Optional<Card> cardResult = cardRepository.returnCardByName(criteria);
         Assertions.assertFalse(cardResult.isPresent());
     }
-    @Test
-    public void returnCardByNameTest() {
-        CardValidationException exception = Assertions.assertThrows(CardValidationException.class, () -> {} );
-        Optional<Card> cardResult = cardRepository.returnCardByName("P");
-        Assertions.assertTrue(cardResult.isPresent());
-    }
-    @Test
-    public void returnCardByNameFailTest() {
-        Optional<Card> cardResult = cardRepository.returnCardByName("m");
-        Assertions.assertFalse(cardResult.isPresent());
-    }
-
 }

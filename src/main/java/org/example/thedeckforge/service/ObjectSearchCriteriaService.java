@@ -7,13 +7,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ObjectSearchCriteriaService {
 
-    public ObjectSearchCriteria getObjectSearchCriteria() {
-        return new  ObjectSearchCriteria();
-    }
-
     public ObjectSearchCriteria createSearchCriteria(Long Id) {
         ObjectSearchCriteria criteria = new ObjectSearchCriteria();
         criteria.setObjectId(Id);
+        return criteria;
+    }
+
+    public ObjectSearchCriteria createSearchCriteria(String cardName) {
+        ObjectSearchCriteria criteria = new ObjectSearchCriteria();
+        criteria.setObjectName(cardName);
         return criteria;
     }
 
@@ -21,7 +23,7 @@ public class ObjectSearchCriteriaService {
         ObjectSearchCriteria criteria = new ObjectSearchCriteria();
 
         if (searchTerm != null && !searchTerm.isBlank()) {
-            criteria.setObjectName(returnStringWithLikeOperator(searchTerm));
+            criteria.setObjectName(searchTerm);
         }
 
         if (cardType != null) {
@@ -31,7 +33,4 @@ public class ObjectSearchCriteriaService {
         return criteria;
     }
 
-    private String returnStringWithLikeOperator(String searchTerm){
-        return "%"+searchTerm.toLowerCase()+"%";
-    }
 }

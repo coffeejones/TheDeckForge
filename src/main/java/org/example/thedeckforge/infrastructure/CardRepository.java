@@ -26,13 +26,6 @@ public class CardRepository implements ICardRepository {
         this.cardSQLQueryBuilder = cardSQLQueryBuilder;
     }
     @Override
-    public void populateCardList() {
-    }
-    @Override
-    public List<Card> returnCardList() {
-        return List.of();
-    }
-    @Override
     public List<Card> returnCardListByName(ObjectSearchCriteria criteria) {
         List<Object> params = new ArrayList<>(); // Ai anvendt, Object bliver brugt siden listen af ting vi gerne vil søge efter kan bestå af flere ting som både String og enums.
         String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
@@ -53,9 +46,12 @@ public class CardRepository implements ICardRepository {
         );
     }
     @Override
-    public Optional<Card> returnCardById(ObjectSearchCriteria  criteria) {
+    public Optional<Card> returnCardByName(ObjectSearchCriteria criteria) {
         List<Object> params = new ArrayList<>();
+
         String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
+        System.out.println("SQL: " + sqlQuery);
+        System.out.println("Params: " + params);
         return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) ->
                 new Card(rs.getLong("CardId"),
                         rs.getString("CharacterName"),
@@ -70,10 +66,6 @@ public class CardRepository implements ICardRepository {
                         rs.getInt("DEF")
                 ), params.toArray()
         ));
-    }
-    @Override
-    public Optional<Card> returnCardByName(String name) {
-        return Optional.empty();
     }
     @Override
     public void saveCard(Card card) {
@@ -91,6 +83,17 @@ public class CardRepository implements ICardRepository {
                 card.getDefense()
                 );
     }
+
+    @Override
+    public void updateCard(Card card) {
+
+    }
+
+    @Override
+    public void deleteCard(Card card) {
+
+    }
+
     @Override
     public List<Deck> getDecksCards(List<Deck> decks){
         String sqlDeckContentsQuery = "SELECT * FROM Cards LEFT JOIN DeckCards ON Cards.CardId = DeckCards.CardId WHERE DeckId = ?";
