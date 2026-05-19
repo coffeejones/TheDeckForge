@@ -113,7 +113,7 @@ public class UserRepository implements IUserRepository {
     }
     @Override
     public Long getUserId(User user){
-        String sql = "SELECT UsersId FROM Users LEFT JOIN Credentials ON Users.UserCrednetialsId = Credentials.CredentialsId WHERE Email = ?";
+        String sql = "SELECT UserId FROM Users LEFT JOIN Credentials ON Users.UserCredentialsId = Credentials.CredentialsId WHERE Email = ?";
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("UserId"), user.getAuthority().getUsername());
     }
 
