@@ -104,4 +104,19 @@ public List<Deck> getUserDecks(User user){
         }
         return presentableList;
     }
+
+    public void deckNameEdit(String newDeckName, String oldDeckName, User user){
+    for(Deck deck : user.getDecks()){
+        if(deck.getName().equals(oldDeckName)){
+            if(newDeckName.equals(oldDeckName)){
+                break;
+            } else {
+                deck.setName(newDeckName);
+                Deck oldDeck = new Deck();
+                oldDeck.setName(oldDeckName);
+                deckRepository.deleteDeck(oldDeck);
+            }
+        }
+    }
+}
 }

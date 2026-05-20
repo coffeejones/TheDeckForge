@@ -91,11 +91,16 @@ public class DeckController {
         deckService.deleteDeck(deckId, user);
         return "redirect:/decks/user-decks";
     }
-    @GetMapping("/deck-name-editor/deckId")
-    public String deckNameEditor(Model model) {
-        model.addAttribute("formatType", FormatType.values());
+    @GetMapping("/deckId/deck-name-editor")
+    public String deckNameEditor(Model model, @PathVariable String deckId) {
+        model.addAttribute("deckId", deckId);
         model.addAttribute("deck", deckService.getDeckForm());
         return "deck-name-editor";
+    }
+    @PostMapping("/deckId/deck-edit")
+    public void deckNameEditorForm(@ModelAttribute("deck") Deck deck, @PathVariable String deckId, @AuthenticationPrincipal User user, Model model) {
+        deckService.deckNameEdit(deckId, deck.getName(), user);
+        saveDeck(deckId, user, model);
     }
 
 }

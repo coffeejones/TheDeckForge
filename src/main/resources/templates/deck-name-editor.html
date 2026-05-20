@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lav dit deck</title>
+    <title>ændre dit deck</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+<form th:action="@{/decks/deckId/deck-edit(deckId=${deckId})}" th:object="${deck}" method="post">
+    <div class="field">
+        <label for="name" class="form-label" >Det nye decks navn:</label><br>
+        <input type="text" id="name" th:field="*{name}" placeholder="eksemplevis dark destroyer deck" required class="form-input" ><br><br>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Ændre decket</button>
+    </div>
+</form>
 </body>
 </html>
