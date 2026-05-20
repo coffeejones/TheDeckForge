@@ -8,10 +8,8 @@ import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.enums.FormatType;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.DeckService;
-import org.example.thedeckforge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -79,10 +77,20 @@ public class DeckController {
     }
     @GetMapping("/deck-editor/{deckId}/save-deck")
     public String saveDeck(@ModelAttribute("deck") @PathVariable String deckId, @AuthenticationPrincipal User user, Model model) {
-        System.out.println("Deck saved?");
         deckService.saveDeck(deckId, user);
         model.addAttribute("user", user);
         return "user-decks";
+    }
+    @GetMapping("/deck-editor/deckId/delete-deck")
+    public String deleteDeck(@RequestParam String deckId, @AuthenticationPrincipal User user) {
+        deckService.deleteDeck(deckId, user);
+        return "redirect:/decks/user-decks";
+    }
+    @GetMapping("/deck-name-editor/deckId")
+    public String deckNameEditor(Model model) {
+        model.addAttribute("formatType", FormatType.values());
+        model.addAttribute("deck", deckService.getDeckForm());
+        return "deck-name-editor";
     }
 
 }

@@ -9,6 +9,7 @@ import org.example.thedeckforge.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -29,12 +30,32 @@ public DeckService(IDeckRepository deckRepository, UserService userService, IUse
 
 public void createDeck(Deck deck, User user){
     deck.setCards(new ArrayList<>());
-    user.setDecks(new ArrayList<>());
-    user.addDeck(deck);
-    deckRepository.createUserDeck(deck,userRepository.getUserId(user));
+    boolean problem = false;
+    if(user.getDecks().isEmpty()){
+        user.addDeck(deck);
+        deckRepository.createUserDeck(deck,userRepository.getUserId(user));
+    } else {
+        for (Deck decks : user.getDecks()) {
+            if (decks.getName().equals(deck.getName())) {
+                //text back
+                problem = true;
+                break;
+            }
+        }
+        if(!problem) {
+            user.addDeck(deck);
+            deckRepository.createUserDeck(deck, userRepository.getUserId(user));
+        }
+    }
+
 }
 public List<Deck> getUserDecks(User user){
-    return cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
+    List<Deck> decks = cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
+    if (decks == null){
+        return new ArrayList<>();
+    } else{
+        return decks;
+    }
 }
     public Deck getDeckForm(){
         return new Deck();
@@ -59,7 +80,6 @@ public List<Deck> getUserDecks(User user){
         }
 
     }
-
     public void saveDeck(String deckName, User user){
     ArrayList<Long> cardIds = new ArrayList<Long>();
     Deck deck = user.getDeckFromName(deckName);
@@ -67,5 +87,17 @@ public List<Deck> getUserDecks(User user){
             cardIds.add(cardRepository.getCardId(card));
         }
     deckRepository.saveDeck(cardIds, deck);
+    }
+    public void deleteDeck(String deckName, User user){
+    Deck deck = user.getDeckFromName(deckName);
+    deckRepository.deleteDeck(deck);
+    }
+
+    public HashMap<Card, Integer> getPresentableDeck(Deck deck){
+    HashMap<Card, Integer> presentableList = new HashMap<>();
+        for (Card card : deck.getCards()) {
+            presentableList.put(card, presentableList.get(card) + 1);
+        }
+        return presentableList;
     }
 }

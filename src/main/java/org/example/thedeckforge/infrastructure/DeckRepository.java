@@ -51,6 +51,14 @@ public class DeckRepository implements IDeckRepository {
             jdbcTemplate.update(saveSql, deckId, cardId);
         }
     }
+    @Override
+    public void deleteDeck(Deck deck){
+        String deleteDeckCardsSql = "delete from deckCards where DeckId = ?";
+        jdbcTemplate.update(deleteDeckCardsSql, getDeckId(deck));
+        String deleteDeckSql = "delete from decks where DeckId = ?";
+        jdbcTemplate.update(deleteDeckSql, getDeckId(deck));
+    }
+
     private Long getDeckId(Deck deck){
         String sql = "SELECT DeckId FROM Decks WHERE DeckName = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{deck.getName()}, Long.class);

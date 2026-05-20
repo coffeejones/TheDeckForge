@@ -10,14 +10,17 @@
 </head>
 <body>
 <div class="auth-footer">
-    <p>Tilbage til <a th:href="@{/decks/deck-editor/{deckId}/save-deck(deckId=${deck.getName()})}">decks</a></p>
+    <p>Tilbage til <a th:href="@{/decks/deck-editor/{deckId}/save-deck(deckId=${deck.name})}">decks</a></p>
 </div>
-<div class="hero-tagline" th:text="|deck størrelse: ${deck.getCards().size()}|"></div>
-<div th:if="${#lists.isEmpty(deck.getCards())}" class="empty-state">
+<div class="auth-footer">
+    <p><a th:href="@{/decks/deck-name-editor/{deckId}(deckId=${deck.name})}">Ændre deckets navn</a></p>
+</div>
+<div class="hero-tagline" th:text="|deck størrelse: ${deck.cards.size()}|"></div>
+<div th:if="${#lists.isEmpty(deck.cards)}" class="empty-state">
     <p class="hero-tagline">Du har ingen kort i dit deck endnu. Tilføj dit første kort!</p>
 </div>
-<div th:unless="${deck.getCards().isEmpty()}" class="collection-grid">
-    <a th:each="card : ${deck.getCards()}"
+<div th:unless="${deck.cards.isEmpty()}" class="collection-grid">
+    <a th:each="card : ${deck.cards}"
        th:href="@{/cards/card-detail/{id}(id=${card.id})}"
        class="collection-card">
         <div class="collection-card-image">
@@ -25,7 +28,7 @@
         </div>
         <div class="collection-card-name" th:text="${card.cardName}">Card Name</div>
         <Div>
-            <form id="remove-from-deck" th:action="@{/decks/deck-editor/{cardId}/{deckId}/remove(cardId=${card.id}, deckId=${deck.getName})}" method="post">
+            <form id="remove-from-deck" th:action="@{/decks/deck-editor/{cardId}/{deckId}/remove(cardId=${card.id}, deckId=${deck.name})}" method="post">
                 <button type="submit" class="btn btn-secondary">fjern fra decket</button>
             </form>
         </div>
@@ -42,7 +45,7 @@
             </p>
         </header>
 
-        <form class="search-bar" th:action="@{/decks/deck-editor/{deckId}/deck-card-list(deckId =${deck.getName()})}" method="get">
+        <form class="search-bar" th:action="@{/decks/deck-editor/{deckId}/deck-card-list(deckId =${deck.name()})}" method="get">
             <input type="text" name="searchTerm"
                    class="form-input"
                    placeholder="Søg igen..."
@@ -65,11 +68,11 @@
                 </div>
             </a>
         </div>
-
+    </div>
+    <div class="hero-actions" style="justify-content: center;">
+        <a th:href="@{/decks/deck-editor/deckId/delete-deck(deckId=${deck.name})}" class="btn btn-primary">Slet deck</a>
     </div>
 </section>
-
-
 <script>
     var pendingToast = sessionStorage.getItem('toastMessage');
     if (pendingToast) {
