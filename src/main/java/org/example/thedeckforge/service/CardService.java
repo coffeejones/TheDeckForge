@@ -55,7 +55,7 @@ public class CardService {
     }
 
     public void saveCard(User adminUser, Card card, MultipartFile picture) throws IOException {
-        validationService.validate(ValidationType.ADMIN, adminUser);
+        validationService.validate(ValidationType.ADMINROLE, adminUser);
         String cardPictureRef = saveImage(picture);
         addPictureReferenceToCard(card,cardPictureRef);
         cardRepository.saveCard(card);
@@ -78,7 +78,7 @@ public class CardService {
     }
 
     public void updateCard(User adminUser, Card card, MultipartFile picture) throws IOException {
-        validationService.validate(ValidationType.ADMIN, adminUser);
+        validationService.validate(ValidationType.ADMINROLE, adminUser);
         if (picture != null && !picture.isEmpty()) {
             String cardPictureRef = saveImage(picture);
             card.setPictureRef(cardPictureRef);
@@ -87,7 +87,7 @@ public class CardService {
     }
 
     public void deleteCard(User adminUser, long cardId) {
-        validationService.validate(ValidationType.ADMIN, adminUser);
+        validationService.validate(ValidationType.ADMINROLE, adminUser);
         collectionService.deleteCardReferenceFromCollection(adminUser, cardId);
         deckService.DeleteCardReferenceFromDeck(adminUser, cardId);
         cardRepository.deleteCard(cardId);

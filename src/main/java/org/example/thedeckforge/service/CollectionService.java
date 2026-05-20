@@ -45,10 +45,10 @@ public class CollectionService {
         collectionRepository.removeCardFromCollection(card.getId(),user.getId());
     }
     public void deleteCardReferenceFromCollection(User adminUser,long cardId){
-        validationService.validate(ValidationType.ADMIN, adminUser);
+        validationService.validate(ValidationType.ADMINROLE, adminUser);
         collectionRepository.deleteCardFromCollectionReference(cardId);
     }
     private void validateUser(User user){
-        validationService.validate(ValidationType.USER,user);
+        validationService.validate(ValidationType.USERROLE,user);
     }
 }

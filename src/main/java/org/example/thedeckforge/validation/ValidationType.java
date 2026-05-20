@@ -7,6 +7,6 @@ public enum ValidationType {
     CARD,
     DECK,
     COLLECTION,
-    USER,
-    ADMIN
+    USERROLE,
+    ADMINROLE
 }

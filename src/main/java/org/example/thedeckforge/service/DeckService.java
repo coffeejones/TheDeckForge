@@ -15,16 +15,16 @@ import java.util.List;
 @Service
 public class DeckService {
     private final IDeckRepository deckRepository;
-    private final ValidationService validationService;
     private final IUserRepository userRepository;
     private final ICardRepository cardRepository;
+    private final ValidationService validationService;
 
     @Autowired
-    public DeckService(IDeckRepository deckRepository, ValidationService validationService, IUserRepository userRepository, ICardRepository cardRepository) {
+    public DeckService(IDeckRepository deckRepository, IUserRepository userRepository, ICardRepository cardRepository, ValidationService validationService) {
         this.deckRepository = deckRepository;
-        this.validationService = validationService;
         this.userRepository = userRepository;
         this.cardRepository = cardRepository;
+        this.validationService = validationService;
     }
 
     public void createDeck(Deck deck, User user){
@@ -59,7 +59,7 @@ public class DeckService {
     }
 
     public void DeleteCardReferenceFromDeck(User adminUser, long cardId){
-        validationService.validate(ValidationType.ADMIN, adminUser);
+        validationService.validate(ValidationType.ADMINROLE, adminUser);
         deckRepository.deleteCardReferenceFromDeck(cardId);
     }
 
@@ -81,7 +81,7 @@ public class DeckService {
         deckRepository.saveDeck(cardIds, deck);
     }
     private void validateUser(User user){
-        validationService.validate(ValidationType.USER,user);
+        validationService.validate(ValidationType.USERROLE,user);
     }
 }
 

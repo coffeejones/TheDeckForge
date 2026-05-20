@@ -28,6 +28,8 @@ public class CardRepository implements ICardRepository {
     public List<Card> returnCardListByName(ObjectSearchCriteria criteria) {
         List<Object> params = new ArrayList<>(); // Ai anvendt, Object bliver brugt siden listen af ting vi gerne vil søge efter kan bestå af flere ting som både String og enums.
         String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
+        System.out.println("SQL: " + sqlQuery);
+        System.out.println("Params: " + params);
         return jdbcTemplate.query(sqlQuery, cardRowMapper(), params.toArray()
         );
     }

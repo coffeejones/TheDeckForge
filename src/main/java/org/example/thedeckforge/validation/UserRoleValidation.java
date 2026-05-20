@@ -6,10 +6,10 @@ import org.example.thedeckforge.validation.exceptions.ValidationException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserValidation implements ValidationStrategy{
+public class UserRoleValidation implements ValidationStrategy{
     @Override
     public ValidationType getValidationType() {
-        return ValidationType.USER;
+        return ValidationType.USERROLE;
     }
 
     @Override
