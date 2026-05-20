@@ -3,9 +3,10 @@ DROP TABLE IF EXISTS Collections;
 DROP TABLE IF EXISTS Decks;
 DROP TABLE IF EXISTS Cards;
 DROP TABLE IF EXISTS event_participant;
+DROP TABLE IF EXISTS event;
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Credentials;
-DROP TABLE IF EXISTS event;
+
 
 
 CREATE TABLE Credentials (
@@ -66,7 +67,9 @@ create table event (
     name varchar(255) not null,
     date varchar(50),
     location varchar(255),
-    description TEXT
+    description TEXT,
+    owner_id bigint not null,
+    foreign key (owner_id) references Users(UserId)
 );
 create table event_participant (
     event_id bigint not null,

@@ -23,7 +23,12 @@ public class EventRepository implements IEventRepository {
 
     @Override
     public List<Event> findAll() {
-        String sql = "SELECT id, name, date, location, description FROM event";
+        String sql = """
+                SELECT e.id, e.name, e.date, e.location, e.description,
+                       e.owner_id, u.name as owner_name
+                FROM event e
+                JOIN Users u ON e.owner_id = u.UserId
+                """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Event e = new Event();
             e.setId(rs.getLong("id"));
@@ -31,15 +36,22 @@ public class EventRepository implements IEventRepository {
             e.setDate(rs.getString("date"));
             e.setLocation(rs.getString("location"));
             e.setDescription(rs.getString("description"));
-            e.setParticipants(findParticipantsByEventId(rs.getLong("id")));
             e.setOwnerId(rs.getLong("owner_id"));
+            e.setOwnerName(rs.getString("owner_name"));
+            e.setParticipants(findParticipantNamesByEventId(rs.getLong("id")));
             return e;
         });
     }
 
     @Override
     public Optional<Event> findById(long id) {
-        String sql = "SELECT id, name, date, location, description FROM event WHERE id = ?";
+        String sql = """
+            SELECT e.id, e.name, e.date, e.location, e.description,
+                   e.owner_id, u.Name AS owner_name
+            FROM event e
+            JOIN Users u ON e.owner_id = u.UserId
+            WHERE e.id = ?
+            """;
         List<Event> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
             Event e = new Event();
             e.setId(rs.getLong("id"));
@@ -47,8 +59,9 @@ public class EventRepository implements IEventRepository {
             e.setDate(rs.getString("date"));
             e.setLocation(rs.getString("location"));
             e.setDescription(rs.getString("description"));
-            e.setParticipants(findParticipantsByEventId(rs.getLong("id")));
             e.setOwnerId(rs.getLong("owner_id"));
+            e.setOwnerName(rs.getString("owner_name"));
+            e.setParticipants(findParticipantNamesByEventId(rs.getLong("id")));
             return e;
         }, id);
         return results.stream().findFirst();
@@ -56,7 +69,10 @@ public class EventRepository implements IEventRepository {
 
     @Override
     public Event save(Event event) {
-        String sql = "INSERT INTO event (name, date, location, description, owner_id) VALUES (?, ?, ?, ?,?)";
+        String sql = """
+            INSERT INTO event (name, date, location, description, owner_id)
+            VALUES (?, ?, ?, ?, ?)
+            """;
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -79,24 +95,37 @@ public class EventRepository implements IEventRepository {
         return rows > 0;
     }
 
-    public List<String> findParticipantsByEventId(long eventId) {
-        String sql = """
-        SELECT u.Name 
-        FROM event_participant ep
-        JOIN Users u ON ep.user_id = u.UserId
-        WHERE ep.event_id = ?
-        """;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("Name"), eventId);
-    }
-
+    @Override
     public void addParticipant(long eventId, long userId) {
         String sql = "INSERT INTO event_participant (event_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, eventId, userId);
     }
 
+    @Override
     public boolean participantExists(long eventId, long userId) {
         String sql = "SELECT COUNT(*) FROM event_participant WHERE event_id = ? AND user_id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, eventId, userId);
         return count != null && count > 0;
+    }
+
+
+    private List<String> findParticipantNamesByEventId(long eventId) {
+        String sql = """
+            SELECT u.Name
+            FROM event_participant ep
+            JOIN Users u ON ep.user_id = u.UserId
+            WHERE ep.event_id = ?
+            """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("Name"), eventId);
+    }
+
+    @Override
+    public void update(Event event) {
+        String sql = """
+        UPDATE event SET name = ?, date = ?, location = ?, description = ?
+        WHERE id = ?
+        """;
+        jdbcTemplate.update(sql, event.getName(), event.getDate(),
+                event.getLocation(), event.getDescription(), event.getId());
     }
 }
