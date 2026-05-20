@@ -2,11 +2,13 @@ package org.example.thedeckforge.service;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.User;
+import org.example.thedeckforge.entity.enums.FormatType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.example.thedeckforge.entity.interfaces.IDeckRepository;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;
 import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,28 +28,26 @@ public class DeckService {
         this.cardRepository = cardRepository;
         this.validationService = validationService;
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public void createDeck(Deck deck, User user){
-        validateUser(user);
         deck.setCards(new ArrayList<>());
         user.setDecks(new ArrayList<>());
         user.addDeck(deck);
         deckRepository.createUserDeck(deck,userRepository.getUserId(user));
     }
+    @PreAuthorize("hasRole('MEMEBER')")
     public List<Deck> getUserDecks(User user){
-        validateUser(user);
         return cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
     }
     public Deck getDeckForm(){
         return new Deck();
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public Deck getSpecificDeckFromUser(User user, String deckName){
         return user.getDeckFromName(deckName);
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public void removeCardFromDeck(String deckName, User user, Card card){
-        validateUser(user);
         for (Deck deck : user.getDecks()){
             if (deck.getName().equals(deckName)){
                 deck.removeCard(card);
@@ -58,11 +58,11 @@ public class DeckService {
         return deckRepository.getAllDecks();
     }
 
-    public void DeleteCardReferenceFromDeck(User adminUser, long cardId){
-        validationService.validate(ValidationType.ADMINROLE, adminUser);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void DeleteCardReferenceFromDeck(long cardId){
         deckRepository.deleteCardReferenceFromDeck(cardId);
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public void addCardToDeck (String deckName, User user, Card card){
         for (Deck deck : user.getDecks()) {
             if (deck.getName().equals(deckName)) {
@@ -70,18 +70,14 @@ public class DeckService {
             }
         }
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public void saveDeck(String deckName, User user){
-        validateUser(user);
         ArrayList<Long> cardIds = new ArrayList<Long>();
         Deck deck = user.getDeckFromName(deckName);
         for (Card card : deck.getCards()) {
             cardIds.add(cardRepository.getCardId(card));
         }
         deckRepository.saveDeck(cardIds, deck);
-    }
-    private void validateUser(User user){
-        validationService.validate(ValidationType.USERROLE,user);
     }
 }
 

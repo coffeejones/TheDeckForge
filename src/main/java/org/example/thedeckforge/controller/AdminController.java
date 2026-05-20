@@ -36,7 +36,7 @@ public class AdminController {
     }
     @PostMapping("/create-card")
     public String createCard(@AuthenticationPrincipal User adminUser,@ModelAttribute("Card") Card card, @RequestParam("cardImage")MultipartFile picture) throws IOException {
-        cardService.saveCard(adminUser, card, picture);
+        cardService.saveCard(card, picture);
         return "admin/create-card-form";
     }
     @GetMapping("/admin-card-list")
@@ -55,13 +55,13 @@ public class AdminController {
         return "admin/admin-card-detail";
     }
     @PostMapping("/admin-card-detail")
-    public String cardEdit(@AuthenticationPrincipal User adminUser, @ModelAttribute("card") Card card, @RequestParam("picture") MultipartFile picture) throws IOException {
-        cardService.updateCard(adminUser, card, picture);
+    public String cardEdit(@ModelAttribute("card") Card card, @RequestParam("picture") MultipartFile picture) throws IOException {
+        cardService.updateCard(card, picture);
         return "redirect:/admin/admin-card-detail/" + card.getCardName();
     }
     @PostMapping("/admin-card-delete/{cardId}")
-    public String deleteCard(@AuthenticationPrincipal User adminUser, @PathVariable long cardId) {
-        cardService.deleteCard(adminUser, cardId);
+    public String deleteCard(@PathVariable long cardId) {
+        cardService.deleteCard(cardId);
         return "redirect:/admin/admin-card-list";
     }
 }

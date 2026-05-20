@@ -6,6 +6,7 @@ import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -21,15 +22,14 @@ public class CardService {
     private final CollectionService collectionService;
     private final DeckService deckService;
     private final ObjectSearchCriteriaService objectSearchCriteriaService;
-    private final ValidationService validationService;
 
     @Autowired
-    public CardService(ICardRepository cardRepository, CollectionService collectionService, DeckService deckService, ObjectSearchCriteriaService objectSearchCriteriaService, ValidationService validationService) {
+    public CardService(ICardRepository cardRepository, CollectionService collectionService, DeckService deckService, ObjectSearchCriteriaService objectSearchCriteriaService) {
         this.cardRepository = cardRepository;
         this.collectionService = collectionService;
         this.deckService = deckService;
         this.objectSearchCriteriaService = objectSearchCriteriaService;
-        this.validationService = validationService;
+
     }
 
     public List<Card> getCardListOnSearchTerm(ObjectSearchCriteria searchTerm) {
@@ -53,9 +53,8 @@ public class CardService {
     public Card createDefaultCard(){
         return new Card();
     }
-
-    public void saveCard(User adminUser, Card card, MultipartFile picture) throws IOException {
-        validationService.validate(ValidationType.ADMINROLE, adminUser);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void saveCard(Card card, MultipartFile picture) throws IOException {
         String cardPictureRef = saveImage(picture);
         addPictureReferenceToCard(card,cardPictureRef);
         cardRepository.saveCard(card);
@@ -76,20 +75,18 @@ public class CardService {
     private void addPictureReferenceToCard(Card card, String cardPictureRef) {
         card.setPictureRef(cardPictureRef);
     }
-
-    public void updateCard(User adminUser, Card card, MultipartFile picture) throws IOException {
-        validationService.validate(ValidationType.ADMINROLE, adminUser);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void updateCard(Card card, MultipartFile picture) throws IOException {
         if (picture != null && !picture.isEmpty()) {
             String cardPictureRef = saveImage(picture);
             card.setPictureRef(cardPictureRef);
         }
         cardRepository.updateCard(card);
     }
-
-    public void deleteCard(User adminUser, long cardId) {
-        validationService.validate(ValidationType.ADMINROLE, adminUser);
-        collectionService.deleteCardReferenceFromCollection(adminUser, cardId);
-        deckService.DeleteCardReferenceFromDeck(adminUser, cardId);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteCard(long cardId) {
+        collectionService.deleteCardReferenceFromCollection(cardId);
+        deckService.DeleteCardReferenceFromDeck(cardId);
         cardRepository.deleteCard(cardId);
     }
 

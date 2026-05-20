@@ -41,6 +41,9 @@ public class Card {
         if(ruleText == null || ruleText.isEmpty()){
             throw new CardValidationException("Card rule text cannot be empty");
         }
+        if(manaCost == null || manaCost.isEmpty()){
+            throw new CardValidationException("Card mana cost cannot be empty");
+        }
         this.id = id;
         this.cardName = cardName;
         this.cardTypes = cardTypes;
