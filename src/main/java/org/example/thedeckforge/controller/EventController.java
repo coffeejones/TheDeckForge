@@ -25,7 +25,9 @@ public class EventController {
     }
 
     private long getCurrentUserId(Principal principal) {
-        User user = userService.findByEmail(principal.getName());
+        // get the Authentication object from the Principal
+        Authentication auth = (Authentication) principal;
+        User user = (User) auth.getPrincipal();
         return user.getId();
     }
 

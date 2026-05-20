@@ -20,12 +20,21 @@ public class EventPageController {
 
     @GetMapping
     public String eventPage(Model model, Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            User user = userService.findByEmail(authentication.getName());
-            model.addAttribute("currentUserId", user.getId());
-            model.addAttribute("userRole", authentication.getAuthorities()
-                    .iterator().next().getAuthority());
-        } else {
+        try {
+            if (authentication != null && authentication.isAuthenticated()
+                    && !authentication.getName().equals("anonymousUser")) {
+
+                // principal is already a User object — just cast it directly
+                User user = (User) authentication.getPrincipal();
+                model.addAttribute("currentUserId", user.getId());
+                model.addAttribute("userRole", authentication.getAuthorities()
+                        .iterator().next().getAuthority());
+            } else {
+                model.addAttribute("currentUserId", -1);
+                model.addAttribute("userRole", "");
+            }
+        } catch (Exception e) {
+            System.out.println("Error getting user: " + e.getMessage());
             model.addAttribute("currentUserId", -1);
             model.addAttribute("userRole", "");
         }
