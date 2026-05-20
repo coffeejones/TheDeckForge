@@ -2,14 +2,13 @@ package org.example.thedeckforge.infrastructure;
 
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.enums.CardType;
-import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class CollectionRepository implements ICollectionRepository {
+public class CollectionRepository implements org.example.thedeckforge.entity.interfaces.ICollectionRepository {
 
     private final JdbcTemplate jdbc;
 

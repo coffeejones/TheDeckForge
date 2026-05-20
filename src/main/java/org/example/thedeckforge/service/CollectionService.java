@@ -2,10 +2,9 @@ package org.example.thedeckforge.service;
 
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.User;
-import org.example.thedeckforge.infrastructure.CollectionRepository;
-import org.example.thedeckforge.infrastructure.UserRepository;
+import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
+import org.example.thedeckforge.entity.interfaces.IUserRepository;
 import org.example.thedeckforge.validation.ValidationType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,11 +12,11 @@ import java.util.List;
 @Service
 public class CollectionService {
 
-    private final CollectionRepository collectionRepository;
-    private final UserRepository userRepository;
+    private final ICollectionRepository collectionRepository;
+    private final IUserRepository userRepository;
     private final ValidationService validationService;
 
-    public CollectionService(CollectionRepository collectionRepository, UserRepository userRepository, ValidationService validationService) {
+    public CollectionService(ICollectionRepository collectionRepository, IUserRepository userRepository, ValidationService validationService) {
         this.collectionRepository = collectionRepository;
         this.userRepository = userRepository;
         this.validationService = validationService;
