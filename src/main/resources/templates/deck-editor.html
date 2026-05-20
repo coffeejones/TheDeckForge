@@ -20,13 +20,13 @@
     <p class="hero-tagline">Du har ingen kort i dit deck endnu. Tilføj dit første kort!</p>
 </div>
 <div th:unless="${deck.cards.isEmpty()}" class="collection-grid">
-    <a th:each="card : ${deck.cards}"
+    <a th:each="card : ${presentableCards.keySet()}"
        th:href="@{/cards/card-detail/{id}(id=${card.id})}"
        class="collection-card">
         <div class="collection-card-image">
             <img th:src="${card.pictureRef}" th:alt="${card.cardName}">
         </div>
-        <div class="collection-card-name" th:text="${card.cardName}">Card Name</div>
+        <div class="collection-card-name" th:text="|${presentableCards.get(card)}X ${card.cardName}|">Card Name</div>
         <Div>
             <form id="remove-from-deck" th:action="@{/decks/deck-editor/{cardId}/{deckId}/remove(cardId=${card.id}, deckId=${deck.name})}" method="post">
                 <button type="submit" class="btn btn-secondary">fjern fra decket</button>
@@ -45,7 +45,7 @@
             </p>
         </header>
 
-        <form class="search-bar" th:action="@{/decks/deck-editor/{deckId}/deck-card-list(deckId =${deck.name()})}" method="get">
+        <form class="search-bar" th:action="@{/decks/deck-editor/{deckId}/deck-card-list(deckId =${deck.name})}" method="get">
             <input type="text" name="searchTerm"
                    class="form-input"
                    placeholder="Søg igen..."

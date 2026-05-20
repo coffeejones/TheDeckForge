@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -49,14 +50,18 @@ public class DeckController {
     @GetMapping("/deck-editor/{id}")
     public String showDeckEditor(@PathVariable String id, Model model,@AuthenticationPrincipal User user) {
         Deck deck = deckService.getSpecificDeckFromUser(user, id);
+        HashMap<Card, Integer> presentableCards = deckService.getPresentableDeck(deck);
         model.addAttribute("deck", deck);
+        model.addAttribute("presentableCards", presentableCards);
         return "deck-editor";
     }
     @GetMapping("/deck-editor/{deckId}/deck-card-list")
     public String deckCardListController(@RequestParam String searchTerm, Model model, CardType cardType, @AuthenticationPrincipal User user, @PathVariable String deckId){
         List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm, cardType);
         Deck deck = deckService.getSpecificDeckFromUser(user, deckId);
+        HashMap<Card, Integer> presentableCards = deckService.getPresentableDeck(deck);
         model.addAttribute("deck", deck);
+        model.addAttribute("presentableCards", presentableCards);
         model.addAttribute("searchResults", searchResults);
         model.addAttribute("searchTerm", searchTerm);
         return "deck-editor";

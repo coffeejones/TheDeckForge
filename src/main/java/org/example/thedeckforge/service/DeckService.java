@@ -94,9 +94,13 @@ public List<Deck> getUserDecks(User user){
     }
 
     public HashMap<Card, Integer> getPresentableDeck(Deck deck){
-    HashMap<Card, Integer> presentableList = new HashMap<>();
+    HashMap<Card, Integer> presentableList = new HashMap<Card, Integer>();
         for (Card card : deck.getCards()) {
-            presentableList.put(card, presentableList.get(card) + 1);
+            if(presentableList.get(card) == null){
+                presentableList.put(card,1);
+            } else {
+                presentableList.put(card, presentableList.get(card) + 1);
+            }
         }
         return presentableList;
     }
