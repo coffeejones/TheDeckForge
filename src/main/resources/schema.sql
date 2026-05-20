@@ -2,8 +2,10 @@ DROP TABLE IF EXISTS DeckCards;
 DROP TABLE IF EXISTS Collections;
 DROP TABLE IF EXISTS Decks;
 DROP TABLE IF EXISTS Cards;
+DROP TABLE IF EXISTS event_participant;
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Credentials;
+DROP TABLE IF EXISTS event;
 
 
 CREATE TABLE Credentials (
@@ -58,3 +60,19 @@ create table DeckCards (
                           foreign key(DeckId) references Decks(DeckId),
                           foreign key(CardId) references Cards(CardId)
 );
+
+create table event (
+    id BIGINT primary key auto_increment,
+    name varchar(255) not null,
+    date varchar(50),
+    location varchar(255),
+    description TEXT
+);
+create table event_participant (
+    event_id bigint not null,
+    user_id bigint not null,
+    primary key (event_id, user_id),
+    foreign key (event_id) references event(id),
+    foreign key (user_id) references Users(UserId)
+);
+

@@ -11,4 +11,6 @@ public interface IEventRepository {
     Optional<Event> findById(long id);
     Event save(Event event);
     boolean deleteById(long id);
+    void addParticipant(long eventId, long userId);
+    boolean participantExists(long eventId, long userId);
 }

@@ -90,27 +90,13 @@
         </div>
     </div>
 </div>
-
-<!-- ADD PARTICIPANT MODAL -->
-<div id="participantOverlay" onclick="handleParticipantOverlayClick(event)" style="
-     display:none; position:fixed; inset:0;
-     background:rgba(10,6,18,0.88); backdrop-filter:blur(8px);
-     align-items:center; justify-content:center; z-index:200;">
-    <div class="auth-card" style="max-width:380px; width:95%;">
-        <div class="auth-header">
-            <h1 style="font-size:1.6rem;">Tilføj Deltager</h1>
-            <p class="auth-subtitle">Indskriv en mester i denne begivenhed</p>
-        </div>
-        <div class="form-field">
-            <label class="form-label">Bruger ID</label>
-            <input class="form-input" type="number" id="p-userId" placeholder="f.eks. 42" />
-        </div>
-        <div style="display:flex; gap:1rem; margin-top:2rem;">
-            <button class="btn btn-secondary" style="flex:1;" onclick="closeParticipantModal()">Annuller</button>
-            <button class="btn btn-primary" style="flex:1;" onclick="submitParticipant()">✦ Tilføj</button>
-        </div>
-    </div>
-</div>
+${(e.participants && e.participants.length > 0)
+? e.participants.map(p => `
+<span style="background:var(--void); border:1px solid var(--amethyst);
+            border-radius:999px; padding:1px 10px; font-family:var(--font-mono);
+            font-size:0.7rem; color:var(--ink-muted);">${esc(p)}</span>`).join('')
+: `<span style="font-size:0.78rem; color:var(--ink-faint); font-style:italic;">
+           Ingen deltagere endnu</span>`}
 
 <script>
     const API = '/api/events';
@@ -187,81 +173,90 @@
 
     /* ── RENDER ── */
     function renderEvents(events) {
+        const currentUserId = parseInt(
+            document.getElementById('current-user')?.dataset.userId || '-1'
+        );
         const grid = document.getElementById('eventsGrid');
         const count = document.getElementById('eventCount');
 
         count.innerHTML = `
-            <strong style="color:var(--gold-bright); font-family:var(--font-mono);">${events.length}</strong>
-            begivenhed${events.length !== 1 ? 'er' : ''} fundet i den arkaniske bog`;
+        <strong style="color:var(--gold-bright); font-family:var(--font-mono);">${events.length}</strong>
+        begivenhed${events.length !== 1 ? 'er' : ''} fundet i den arkaniske bog`;
 
         if (events.length === 0) {
             grid.innerHTML = `
-                <div style="grid-column:1/-1; text-align:center; padding:var(--space-16) var(--space-8);
-                     border:1px dashed rgba(240,198,116,0.25); border-radius:var(--radius-lg);
-                     background:rgba(20,9,42,0.4);">
-                    <div style="font-size:2.5rem; color:var(--gold); opacity:0.5; margin-bottom:var(--space-4);">✦</div>
-                    <p style="color:var(--ink-muted); font-style:italic; margin-bottom:var(--space-6);">
-                        Ingen begivenheder fundet i den arkaniske bog.
-                    </p>
-                    <button class="btn btn-primary" onclick="openCreateModal()">✦ Opret Første Event</button>
-                </div>`;
+            <div style="grid-column:1/-1; text-align:center; padding:var(--space-16) var(--space-8);
+                 border:1px dashed rgba(240,198,116,0.25); border-radius:var(--radius-lg);
+                 background:rgba(20,9,42,0.4);">
+                <div style="font-size:2.5rem; color:var(--gold); opacity:0.5; margin-bottom:var(--space-4);">✦</div>
+                <p style="color:var(--ink-muted); font-style:italic; margin-bottom:var(--space-6);">
+                    Ingen begivenheder fundet i den arkaniske bog.
+                </p>
+                <button class="btn btn-primary" onclick="openCreateModal()">✦ Opret Første Event</button>
+            </div>`;
             return;
         }
 
         grid.innerHTML = events.map((e, i) => `
-            <div class="stat" style="text-align:left; cursor:default;
-                 animation:fadeUp 0.4s var(--ease-out) ${i * 50}ms both;
-                 display:flex; flex-direction:column; gap:var(--space-3);">
+        <div class="stat" style="text-align:left; cursor:default;
+             animation:fadeUp 0.4s var(--ease-out) ${i * 50}ms both;
+             display:flex; flex-direction:column; gap:var(--space-3);">
 
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <div style="font-family:var(--font-display); font-size:1rem; font-weight:700;
-                             color:var(--gold-bright); letter-spacing:0.03em; line-height:1.3;">
-                            ${esc(e.name)}
-                        </div>
-                        <div style="font-family:var(--font-body); font-size:0.85rem;
-                             color:var(--ink-muted); font-style:italic; margin-top:2px;">
-                            📍 ${esc(e.location) || 'Sted TBD'}
-                        </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <div style="font-family:var(--font-display); font-size:1rem; font-weight:700;
+                         color:var(--gold-bright); letter-spacing:0.03em; line-height:1.3;">
+                        ${esc(e.name)}
                     </div>
-                    <div style="font-family:var(--font-display); font-size:1.5rem;
-                         color:var(--gold); opacity:0.5; flex-shrink:0; margin-left:0.5rem;">✦</div>
+                    <div style="font-family:var(--font-body); font-size:0.85rem;
+                         color:var(--ink-muted); font-style:italic; margin-top:2px;">
+                        📍 ${esc(e.location) || 'Sted TBD'}
+                    </div>
                 </div>
+                <div style="font-family:var(--font-display); font-size:1.5rem;
+                     color:var(--gold); opacity:0.5; flex-shrink:0; margin-left:0.5rem;">✦</div>
+            </div>
 
-                <div style="font-family:var(--font-mono); font-size:0.8rem;
-                     color:var(--gold); letter-spacing:0.15em; text-transform:uppercase;">
-                    ${esc(e.date) || 'Dato TBD'}
-                </div>
+            <div style="font-family:var(--font-mono); font-size:0.8rem;
+                 color:var(--gold); letter-spacing:0.15em; text-transform:uppercase;">
+                ${esc(e.date) || 'Dato TBD'}
+            </div>
 
-                ${e.description ? `
-                    <p style="font-size:0.85rem; color:var(--ink-muted); font-style:italic;
-                       line-height:1.5; margin:0; overflow:hidden; display:-webkit-box;
-                       -webkit-line-clamp:2; -webkit-box-orient:vertical;">
-                        ${esc(e.description)}
-                    </p>` : ''}
+            ${e.description ? `
+                <p style="font-size:0.85rem; color:var(--ink-muted); font-style:italic;
+                   line-height:1.5; margin:0; overflow:hidden; display:-webkit-box;
+                   -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                    ${esc(e.description)}
+                </p>` : ''}
 
-                <div style="display:flex; flex-wrap:wrap; gap:4px; min-height:20px;">
-                    ${(e.participants && e.participants.length > 0)
+            <div style="display:flex; flex-wrap:wrap; gap:4px; min-height:20px;">
+                ${(e.participants && e.participants.length > 0)
             ? e.participants.map(p => `
-                            <span style="background:var(--void); border:1px solid var(--amethyst);
-                                border-radius:999px; padding:1px 10px; font-family:var(--font-mono);
-                                font-size:0.7rem; color:var(--ink-muted);">ID ${p}</span>`).join('')
+                        <span style="background:var(--void); border:1px solid var(--amethyst);
+                            border-radius:999px; padding:1px 10px; font-family:var(--font-mono);
+                            font-size:0.7rem; color:var(--ink-muted);">ID ${p}</span>`).join('')
             : `<span style="font-size:0.78rem; color:var(--ink-faint); font-style:italic;">
-                               Ingen deltagere endnu</span>`}
-                </div>
+                           Ingen deltagere endnu</span>`}
+            </div>
 
-                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:auto;
-                     padding-top:var(--space-3); border-top:1px solid rgba(240,198,116,0.15);">
+            <!-- ACTIONS — this is where the owner check happens -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:auto;
+                 padding-top:var(--space-3); border-top:1px solid rgba(240,198,116,0.15);">
+
+                <!-- join button visible to everyone -->
+                <button class="filter-chip" style="font-size:0.7rem;"
+                    onclick="joinEvent(${e.id})">+ Deltag</button>
+                <!-- edit and delete only visible to the owner -->
+                ${e.ownerId === currentUserId ? `
                     <button class="filter-chip" style="font-size:0.7rem;"
                         onclick="openEditModal(${e.id})">✦ Rediger</button>
-                    <button class="filter-chip" style="font-size:0.7rem;"
-                        onclick="openParticipantModal(${e.id})">+ Deltag</button>
                     <button class="filter-chip" style="font-size:0.7rem; margin-left:auto;
                         border-color:rgba(239,68,68,0.35); color:#fca5a5;"
                         onclick="deleteEvent(${e.id})">Slet</button>
-                </div>
+                ` : ''}
             </div>
-        `).join('');
+        </div>
+    `).join('');
     }
 
     /* ── MODALS ── */
@@ -330,38 +325,20 @@
         }
     }
 
-    /* ── PARTICIPANTS ── */
-    function openParticipantModal(eventId) {
-        participantTargetId = eventId;
-        document.getElementById('p-userId').value = '';
-        document.getElementById('participantOverlay').style.display = 'flex';
-    }
-
-    function closeParticipantModal() {
-        document.getElementById('participantOverlay').style.display = 'none';
-    }
-
-    function handleParticipantOverlayClick(ev) {
-        if (ev.target === document.getElementById('participantOverlay')) closeParticipantModal();
-    }
-
-    async function submitParticipant() {
-        const userId = parseInt(document.getElementById('p-userId').value);
-        if (isNaN(userId)) return;
+    async function joinEvent(eventId) {
         try {
             const { header, token } = getCsrf();
-            const res = await fetch(`${API}/${participantTargetId}/participants/${userId}`, {
+            const res = await fetch(`${API}/${eventId}/participants`, {
                 method: 'POST',
                 headers: { [header]: token }
             });
             if (res.ok) {
-                toast('✦ Mester indskrevet i begivenheden');
-                closeParticipantModal();
+                toast('✦ Du er nu tilmeldt begivenheden');
                 await loadEvents();
             } else if (res.status === 400) {
-                toast('⚠ Denne mester er allerede indskrevet');
+                toast('⚠ Du er allerede tilmeldt denne begivenhed');
             } else {
-                toast('⚠ Indskrivningsritualet fejlede');
+                toast('⚠ Tilmelding fejlede');
             }
         } catch (err) {
             toast('⚠ Kunne ikke nå serveren');
@@ -384,4 +361,5 @@
 </script>
 
 </body>
+<div id="current-user" th:attr="data-user-id=${currentUserId}" style="display:none;"></div>
 </html>

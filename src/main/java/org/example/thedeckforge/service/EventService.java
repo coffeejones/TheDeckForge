@@ -26,35 +26,47 @@ public class EventService {
     }
 
 
-    public Optional<Event> getEventById(long id) {
+    public Optional<Event> getEventById(Long id) {
         return ieventRepository.findById(id);
     }
 
-    public Event createEvent(Event event) {
+    public Event createEvent(Event event, long ownerId) {
+        event.setOwnerId(ownerId);
         return ieventRepository.save(event);
     }
 
-    public Event updateEvent(long id, Event updateEvent) {
+    public Event updateEvent(Long id, Event updateEvent, long requestingUserId) {
         Event existing = ieventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + id));
 
+        if (!existing.getOwnerId().equals(requestingUserId)) {
+            throw new RuntimeException("not authorized");
+        }
+
         existing.setName(updateEvent.getName());
         existing.setDate(updateEvent.getDate());
-        existing.setLocation(updateEvent.getDescription());
-        existing.setParticipants(updateEvent.getParticipants());
-
+        existing.setLocation(updateEvent.getLocation());
+        existing.setDescription(updateEvent.getDescription());
         return existing;
+
     }
 
-    public boolean deleteEvent(long id) {
+    public boolean deleteEvent(Long id, long requestingUserId) {
+        Event existing = ieventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
+
+        if (!existing.getOwnerId().equals(requestingUserId)) {
+            throw new RuntimeException("Not authorized");
+        }
         return ieventRepository.deleteById(id);
+
     }
 
-    public boolean addParticipant(long id, long userId) {
+    public boolean addParticipant(Long id, long userId) {
         Event event = ieventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + id));
         if (!event.getParticipants().contains(userId)) {
-            event.getParticipants().add(userId);
+            event.getParticipants().add(userId));
             return true;
         }
         return false;
