@@ -9,6 +9,7 @@ public class Deck {
     private String name;
     private List<Card> cards;
     private FormatType format;
+    private Card commanderCard;
 
     public Deck(long deckId, String name, FormatType format) {
         this.deckId = deckId;
@@ -61,6 +62,12 @@ public class Deck {
     }
     public void setFormat(FormatType format) {
         this.format = format;
+    }
+    public Card getCommanderCard() {
+        return commanderCard;
+    }
+    public void setCommanderCard(Card commanderCard) {
+        this.commanderCard = commanderCard;
     }
 
 }

@@ -98,9 +98,16 @@ public class DeckController {
         return "deck-name-editor";
     }
     @PostMapping("/deckId/deck-edit")
-    public void deckNameEditorForm(@ModelAttribute("deck") Deck deck, @PathVariable String deckId, @AuthenticationPrincipal User user, Model model) {
+    public String deckNameEditorForm(@ModelAttribute("deck") Deck deck, @PathVariable String deckId, @AuthenticationPrincipal User user, Model model) {
         deckService.deckNameEdit(deckId, deck.getName(), user);
         saveDeck(deckId, user, model);
+        return "redirect:deck-editor/deckId";
+    }
+    @PostMapping("/deck-editor/cardId/deckId/addCommander")
+    public String addCommander(@PathVariable String deckId,@PathVariable long cardId, @AuthenticationPrincipal User user, Model model) {
+        Card card = cardService.getCardById(cardId);
+        deckService.setCommanderCard(deckId, user, card);
+        return "redirect:deck-editor/deckId";
     }
 
 }
