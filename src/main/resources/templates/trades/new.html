@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opret byttehandel — Deckforge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/trades.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<section class="trades-page">
+    <div class="container">
+
+        <header class="collection-header">
+            <a th:href="@{/trades}" class="hero-eyebrow trade-back-link">‹ Tilbage til bazaaren</a>
+            <h1>Opret byttehandel</h1>
+            <p class="section-subtitle">Vælg hvad du tilbyder, og hvad du gerne vil have. Maks 3 kort på hver side.</p>
+        </header>
+
+        <!-- Live summary (sticky) -->
+        <div class="trade-summary">
+            <div class="trade-summary-side">
+                <div class="trade-summary-label">Du tilbyder</div>
+                <div class="trade-summary-count">
+                    <span id="offered-count">0</span> / 3 kort
+                </div>
+            </div>
+            <div class="trade-summary-arrow">⇌</div>
+            <div class="trade-summary-side">
+                <div class="trade-summary-label">Du vil have</div>
+                <div class="trade-summary-count">
+                    <span id="wanted-count">0</span> / 3 kort
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Min samling -->
+        <section class="trade-builder-section">
+            <h2 class="trades-section-title">
+                <span class="trades-section-icon">⚔</span>
+                Vælg fra din samling (det du tilbyder)
+            </h2>
+            <p class="section-subtitle" style="text-align:left;margin-bottom:24px;">
+                Disse kort tilhører dig og bliver byttet væk hvis handlen accepteres.
+            </p>
+
+            <div th:if="${#lists.isEmpty(myCards)}" class="collection-empty">
+                <div class="empty-ornament">✦</div>
+                <p>Du har ingen kort i samlingen at bytte med endnu.</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(myCards)}" class="trade-pick-grid">
+                <label th:each="card : ${myCards}" class="trade-pick-card">
+                    <input type="checkbox"
+                           th:value="${card.id}"
+                           class="trade-pick-input trade-pick-offered">
+                    <div class="trade-pick-image">
+                        <img th:src="${card.pictureRef}" th:alt="${card.cardName}">
+                        <div class="trade-pick-checkmark">✓</div>
+                    </div>
+                    <div class="trade-pick-name" th:text="${card.cardName}">Card</div>
+                </label>
+            </div>
+        </section>
+
+        <!-- Section 2: Kortkatalog med søgning + paginering -->
+        <section class="trade-builder-section">
+            <h2 class="trades-section-title">
+                <span class="trades-section-icon">⚜</span>
+                Vælg fra kortkataloget (det du vil have)
+            </h2>
+            <p class="section-subtitle" style="text-align:left;margin-bottom:24px;">
+                Søg efter et bestemt kort, eller browse kataloget.
+            </p>
+
+            <!-- Søgebar -->
+            <form class="search-bar" th:action="@{/trades/new}" method="get">
+                <input type="text" name="search"
+                       class="form-input"
+                       th:value="${search}"
+                       placeholder="Søg efter kortnavn...">
+                <button type="submit" class="btn btn-primary">Søg</button>
+                <a th:if="${!#strings.isEmpty(search)}"
+                   th:href="@{/trades/new}"
+                   class="btn btn-secondary">Ryd</a>
+            </form>
+
+            <p class="section-subtitle" style="text-align:left;margin-bottom:24px;" th:if="${totalResults > 0}">
+                <strong th:text="${totalResults}">100</strong> kort fundet
+                <span th:if="${!#strings.isEmpty(search)}">
+                    for "<em th:text="${search}">søgning</em>"
+                </span>
+            </p>
+
+            <div th:if="${#lists.isEmpty(catalogCards)}" class="collection-empty">
+                <div class="empty-ornament">✦</div>
+                <p>Ingen kort fundet. Prøv en anden søgning.</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(catalogCards)}" class="trade-pick-grid">
+                <label th:each="card : ${catalogCards}" class="trade-pick-card">
+                    <input type="checkbox"
+                           th:value="${card.id}"
+                           class="trade-pick-input trade-pick-wanted">
+                    <div class="trade-pick-image">
+                        <img th:src="${card.pictureRef}" th:alt="${card.cardName}">
+                        <div class="trade-pick-checkmark">✓</div>
+                    </div>
+                    <div class="trade-pick-name" th:text="${card.cardName}">Card</div>
+                </label>
+            </div>
+
+            <!-- Paginering -->
+            <nav th:if="${totalPages > 1}" class="pagination">
+                <a th:href="@{/trades/new(page=${currentPage - 1}, search=${search})}"
+                   class="page-btn page-prev"
+                   th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                    ‹ Forrige
+                </a>
+
+                <div class="page-numbers">
+                    <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                       th:href="@{/trades/new(page=${i}, search=${search})}"
+                       th:text="${i + 1}"
+                       class="page-num"
+                       th:classappend="${i == currentPage} ? 'active' : ''">1</a>
+                </div>
+
+                <a th:href="@{/trades/new(page=${currentPage + 1}, search=${search})}"
+                   class="page-btn page-next"
+                   th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                    Næste ›
+                </a>
+            </nav>
+        </section>
+
+        <!-- Submit-form — separat fra paginerings-formen -->
+        <form th:action="@{/trades/new}" method="post" id="trade-submit-form">
+            <!-- Hidden inputs udfyldes af JavaScript ved submit -->
+            <div id="hidden-inputs"></div>
+
+            <div class="trade-submit-bar">
+                <a th:href="@{/trades}" class="btn btn-secondary">Annullér</a>
+                <button type="submit" class="btn btn-primary" id="trade-submit" disabled>
+                    Opret byttehandel
+                </button>
+            </div>
+        </form>
+
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-ornament">⚜ ✦ ⚜</div>
+        <p class="footer-text">Deckforge · Anno MMXXVI</p>
+    </div>
+</footer>
+
+<script>
+(function () {
+    const MAX = 3;
+    const STORAGE_OFFERED = 'trade-new-offered';
+    const STORAGE_WANTED  = 'trade-new-wanted';
+
+    // Læs fra sessionStorage (sat = Set af ID'er som strenge)
+    function loadSet(key) {
+        const raw = sessionStorage.getItem(key);
+        return new Set(raw ? JSON.parse(raw) : []);
+    }
+    function saveSet(key, set) {
+        sessionStorage.setItem(key, JSON.stringify(Array.from(set)));
+    }
+
+    const offeredSet = loadSet(STORAGE_OFFERED);
+    const wantedSet  = loadSet(STORAGE_WANTED);
+
+    // Pre-check de checkboxes der allerede er valgt (overlever paginering!)
+    document.querySelectorAll('.trade-pick-offered').forEach(c => {
+        if (offeredSet.has(c.value)) c.checked = true;
+    });
+    document.querySelectorAll('.trade-pick-wanted').forEach(c => {
+        if (wantedSet.has(c.value)) c.checked = true;
+    });
+
+    // Counters i toppen
+    const offeredCount = document.getElementById('offered-count');
+    const wantedCount  = document.getElementById('wanted-count');
+    const submitBtn    = document.getElementById('trade-submit');
+    const hiddenWrap   = document.getElementById('hidden-inputs');
+
+    function updateCounters() {
+        offeredCount.textContent = offeredSet.size;
+        wantedCount.textContent  = wantedSet.size;
+        submitBtn.disabled = !(
+            offeredSet.size >= 1 && offeredSet.size <= MAX &&
+            wantedSet.size  >= 1 && wantedSet.size  <= MAX
+        );
+    }
+    updateCounters();
+
+    // Disable resterende checkboxes hvis MAX nået
+    function enforceMax() {
+        document.querySelectorAll('.trade-pick-offered').forEach(c => {
+            c.disabled = offeredSet.size >= MAX && !c.checked;
+        });
+        document.querySelectorAll('.trade-pick-wanted').forEach(c => {
+            c.disabled = wantedSet.size >= MAX && !c.checked;
+        });
+    }
+    enforceMax();
+
+    // Lyt efter ændringer på alle checkboxes (også dem på nuværende side)
+    function bindCheckbox(input, set, storageKey) {
+        input.addEventListener('change', () => {
+            if (input.checked) {
+                if (set.size >= MAX) {
+                    input.checked = false;
+                    return;
+                }
+                set.add(input.value);
+            } else {
+                set.delete(input.value);
+            }
+            saveSet(storageKey, set);
+            updateCounters();
+            enforceMax();
+        });
+    }
+    document.querySelectorAll('.trade-pick-offered').forEach(c =>
+        bindCheckbox(c, offeredSet, STORAGE_OFFERED));
+    document.querySelectorAll('.trade-pick-wanted').forEach(c =>
+        bindCheckbox(c, wantedSet,  STORAGE_WANTED));
+
+    // Ved submit: tilføj hidden inputs for ALLE valgte ID'er (også dem fra andre sider)
+    document.getElementById('trade-submit-form').addEventListener('submit', (e) => {
+        hiddenWrap.innerHTML = '';
+        offeredSet.forEach(id => {
+            const inp = document.createElement('input');
+            inp.type = 'hidden';
+            inp.name = 'offeredCardIds';
+            inp.value = id;
+            hiddenWrap.appendChild(inp);
+        });
+        wantedSet.forEach(id => {
+            const inp = document.createElement('input');
+            inp.type = 'hidden';
+            inp.name = 'wantedCardIds';
+            inp.value = id;
+            hiddenWrap.appendChild(inp);
+        });
+        // Ryd sessionStorage så vi starter fresh næste gang
+        sessionStorage.removeItem(STORAGE_OFFERED);
+        sessionStorage.removeItem(STORAGE_WANTED);
+    });
+})();
+</script>
+
+</body>
+</html>

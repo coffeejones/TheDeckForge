@@ -84,4 +84,9 @@ public class CollectionRepository implements ICollectionRepository {
     public void deleteCardFromCollectionReference(long cardId) {
         jdbc.update("DELETE FROM Collections WHERE CardId = ?", cardId);
     }
+
+    public void addCardToCollection(long responderId, long cardId) {
+        String sql = "INSERT INTO Collections (UserId,CardId) VALUES (?,?)";
+        jdbc.update(sql, responderId, cardId);
+    }
 }

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reagér på byttehandel — Deckforge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/trades.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<section class="trades-page">
+    <div class="container">
+
+        <a th:href="@{/trades/{id}(id=${trade.tradeId})}" class="hero-eyebrow trade-back-link">‹ Tilbage</a>
+
+        <header class="collection-header">
+            <span class="hero-eyebrow">✦ Reagér på handel ✦</span>
+            <h1>Vælg hvad du vil bytte med</h1>
+            <p class="section-subtitle">
+                <strong th:text="${proposerName}">Marcus</strong> har foreslået denne handel.
+                Vælg hvilke kort fra din samling du vil bytte væk.
+            </p>
+        </header>
+
+        <!-- Hvad proposer vil have (reference) -->
+        <div class="trade-want-reference">
+            <div class="trade-want-reference-label">
+                <strong th:text="${proposerName}">Marcus</strong> ønsker:
+            </div>
+            <div class="trade-mini-cards trade-mini-cards-lg">
+                <div th:each="tc : ${trade.wanted}" class="trade-want-card">
+                    <img th:src="${tc.card.pictureRef}" th:alt="${tc.card.cardName}">
+                    <div class="trade-want-card-name" th:text="${tc.card.cardName}">Card</div>
+                </div>
+            </div>
+            <p class="trade-want-hint">
+                Vælger du <em>præcis disse kort</em> → handlen gennemføres med det samme.<br>
+                Vælger du <em>andre kort</em> → det bliver et modforslag som
+                <strong th:text="${proposerName}">Marcus</strong> kan acceptere eller afvise.
+            </p>
+        </div>
+
+        <form th:action="@{/trades/{id}/respond(id=${trade.tradeId})}" method="post" id="respond-form">
+
+            <div class="trade-summary">
+                <div class="trade-summary-side">
+                    <div class="trade-summary-label">Du giver</div>
+                    <div class="trade-summary-count">
+                        <span id="given-count">0</span> / 3 kort
+                    </div>
+                </div>
+                <div class="trade-summary-arrow">⇌</div>
+                <div class="trade-summary-side">
+                    <div class="trade-summary-label">Resultat</div>
+                    <div class="trade-summary-result" id="result-label">Vælg kort først</div>
+                </div>
+            </div>
+
+            <section class="trade-builder-section">
+                <h2 class="trades-section-title">
+                    <span class="trades-section-icon">⚔</span>
+                    Vælg fra din samling
+                </h2>
+
+                <div th:if="${#lists.isEmpty(myCards)}" class="collection-empty">
+                    <div class="empty-ornament">✦</div>
+                    <p>Du har ingen kort i samlingen.</p>
+                </div>
+
+                <div th:unless="${#lists.isEmpty(myCards)}" class="trade-pick-grid">
+                    <label th:each="card : ${myCards}" class="trade-pick-card"
+                           th:classappend="${wantedIds.contains(card.id)} ? 'trade-pick-card-match'">
+                        <input type="checkbox"
+                               name="responderCardIds"
+                               th:value="${card.id}"
+                               th:data-wanted="${wantedIds.contains(card.id)}"
+                               class="trade-pick-input trade-pick-given">
+                        <div class="trade-pick-image">
+                            <img th:src="${card.pictureRef}" th:alt="${card.cardName}">
+                            <div class="trade-pick-checkmark">✓</div>
+                            <div th:if="${wantedIds.contains(card.id)}" class="trade-pick-match-badge">⚡ Ønsket</div>
+                        </div>
+                        <div class="trade-pick-name" th:text="${card.cardName}">Card</div>
+                    </label>
+                </div>
+            </section>
+
+            <div class="trade-submit-bar">
+                <a th:href="@{/trades/{id}(id=${trade.tradeId})}" class="btn btn-secondary">Annullér</a>
+                <button type="submit" class="btn btn-primary" id="respond-submit" disabled>
+                    <span id="submit-label">Vælg kort først</span>
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-ornament">⚜ ✦ ⚜</div>
+        <p class="footer-text">Deckforge · Anno MMXXVI</p>
+    </div>
+</footer>
+
+<script th:inline="javascript">
+(function () {
+    const MAX = 3;
+    const wantedIds = /*[[${wantedIds}]]*/ [];
+    const wantedCount = wantedIds.length;
+
+    const inputs = document.querySelectorAll('.trade-pick-given');
+    const countEl = document.getElementById('given-count');
+    const resultEl = document.getElementById('result-label');
+    const submitBtn = document.getElementById('respond-submit');
+    const submitLabel = document.getElementById('submit-label');
+
+    function update() {
+        const checked = Array.from(inputs).filter(c => c.checked);
+        const ids = checked.map(c => parseInt(c.value));
+        countEl.textContent = checked.length;
+
+        // Max 3
+        if (checked.length >= MAX) {
+            inputs.forEach(c => { if (!c.checked) c.disabled = true; });
+        } else {
+            inputs.forEach(c => { c.disabled = false; });
+        }
+
+        if (checked.length === 0) {
+            resultEl.textContent = 'Vælg kort først';
+            resultEl.className = 'trade-summary-result';
+            submitBtn.disabled = true;
+            submitLabel.textContent = 'Vælg kort først';
+            return;
+        }
+
+        // Match check: samme antal og alle ids er i wantedIds
+        const isExactMatch =
+            checked.length === wantedCount &&
+            ids.every(id => wantedIds.includes(id));
+
+        if (isExactMatch) {
+            resultEl.textContent = '✓ Færdiggør handel';
+            resultEl.className = 'trade-summary-result trade-summary-match';
+            submitLabel.textContent = '✓ Færdiggør handel';
+        } else {
+            resultEl.textContent = '⚡ Bliver et modforslag';
+            resultEl.className = 'trade-summary-result trade-summary-counter';
+            submitLabel.textContent = '⚡ Foreslå modforslag';
+        }
+        submitBtn.disabled = false;
+    }
+
+    inputs.forEach(c => c.addEventListener('change', update));
+})();
+</script>
+
+</body>
+</html>

@@ -18,5 +18,6 @@ public interface ICardRepository {
     List<Deck> getDecksCards(List<Deck> decks);
     long getCardId (Card card);
     Optional<Card> returnCardById(ObjectSearchCriteria  criteria);
-
+    List<Card> searchPaginated(String searchTerm, int page, int pageSize);
+    int countSearchResults(String searchTerm);
 }

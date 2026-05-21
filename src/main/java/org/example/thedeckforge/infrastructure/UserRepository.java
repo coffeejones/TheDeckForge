@@ -136,4 +136,9 @@ public class UserRepository implements IUserRepository {
         String sql = "INSERT INTO Collections (UserId,CardId) VALUES (?,?)";
         jdbcTemplate.update(sql, user.getId(), card.getId());
     }
+
+    public String findNameById(Long userId) {
+        String sql = "SELECT Name FROM Users WHERE UserId = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getString("Name"), userId);
+    }
 }

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytter — Deckforge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/trades.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<section class="trades-page">
+    <div class="container">
+
+        <header class="collection-header">
+            <span class="hero-eyebrow">✦ Bazaaren ✦</span>
+            <h1>Byttehandler</h1>
+            <p class="section-subtitle">Tilbyd dine kort til samfundet — eller find det du har manglet.</p>
+        </header>
+
+        <div class="trades-toolbar">
+            <a th:href="@{/trades/new}" class="btn btn-primary">+ Opret ny byttehandel</a>
+        </div>
+
+        <!-- Counter-proposals der venter på mig -->
+        <div th:if="${!#lists.isEmpty(countersWaiting)}" class="trades-section trades-section-accent">
+            <h2 class="trades-section-title">
+                <span class="trades-section-icon">⚡</span>
+                Modforslag der venter på dig
+                <span class="trades-count" th:text="${#lists.size(countersWaiting)}">2</span>
+            </h2>
+
+            <div class="trades-grid">
+                <article th:each="trade : ${countersWaiting}" class="trade-card trade-card-counter">
+                    <div class="trade-header">
+                        <span class="trade-status status-counter">Modforslag</span>
+                        <span class="trade-date" th:text="${#temporals.format(trade.createdAt, 'd. MMM')}">10. maj</span>
+                    </div>
+                    <div class="trade-flow">
+                        <div class="trade-side">
+                            <div class="trade-side-label">Du gav</div>
+                            <div class="trade-mini-cards">
+                                <img th:each="tc : ${trade.offered}"
+                                     th:src="${tc.card.pictureRef}"
+                                     th:alt="${tc.card.cardName}"
+                                     class="trade-mini-card">
+                            </div>
+                        </div>
+                        <div class="trade-arrow">⇌</div>
+                        <div class="trade-side">
+                            <div class="trade-side-label">Modforslag</div>
+                            <div class="trade-mini-cards">
+                                <img th:each="tc : ${trade.counterOffered}"
+                                     th:src="${tc.card.pictureRef}"
+                                     th:alt="${tc.card.cardName}"
+                                     class="trade-mini-card">
+                            </div>
+                        </div>
+                    </div>
+                    <a th:href="@{/trades/{id}(id=${trade.tradeId})}" class="btn btn-secondary btn-block">Se og afgør</a>
+                </article>
+            </div>
+        </div>
+
+        <!-- Åbne handler -->
+        <div class="trades-section">
+            <h2 class="trades-section-title">
+                <span class="trades-section-icon">📜</span>
+                Åbne handler
+                <span class="trades-count" th:text="${#lists.size(openTrades)}">7</span>
+            </h2>
+
+            <div th:if="${#lists.isEmpty(openTrades)}" class="collection-empty">
+                <div class="empty-ornament">✦</div>
+                <p>Ingen åbne handler lige nu. Vær den første!</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(openTrades)}" class="trades-grid">
+                <article th:each="trade : ${openTrades}" class="trade-card">
+                    <div class="trade-header">
+                        <span class="trade-status status-open">Åben</span>
+                        <span class="trade-proposer">af <strong th:text="${trade.proposerName}">Marcus</strong></span>
+                    </div>
+                    <div class="trade-flow">
+                        <div class="trade-side">
+                            <div class="trade-side-label">Tilbyder</div>
+                            <div class="trade-mini-cards">
+                                <img th:each="tc : ${trade.offered}"
+                                     th:src="${tc.card.pictureRef}"
+                                     th:alt="${tc.card.cardName}"
+                                     class="trade-mini-card">
+                            </div>
+                        </div>
+                        <div class="trade-arrow">⇌</div>
+                        <div class="trade-side">
+                            <div class="trade-side-label">Vil have</div>
+                            <div class="trade-mini-cards">
+                                <img th:each="tc : ${trade.wanted}"
+                                     th:src="${tc.card.pictureRef}"
+                                     th:alt="${tc.card.cardName}"
+                                     class="trade-mini-card">
+                            </div>
+                        </div>
+                    </div>
+                    <a th:href="@{/trades/{id}(id=${trade.tradeId})}" class="btn btn-secondary btn-block">Se detaljer</a>
+                </article>
+            </div>
+        </div>
+
+        <!-- Mine forslag -->
+        <div class="trades-section">
+            <h2 class="trades-section-title">
+                <span class="trades-section-icon">⚜</span>
+                Mine forslag
+                <span class="trades-count" th:text="${#lists.size(myTrades)}">3</span>
+            </h2>
+
+            <div th:if="${#lists.isEmpty(myTrades)}" class="collection-empty">
+                <div class="empty-ornament">✦</div>
+                <p>Du har ikke oprettet nogen byttehandler endnu.</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(myTrades)}" class="trades-grid">
+                <article th:each="trade : ${myTrades}" class="trade-card">
+                    <div class="trade-header">
+                        <span class="trade-status"
+                              th:classappend="|status-${#strings.toLowerCase(trade.status)}|"
+                              th:text="${trade.status}">OPEN</span>
+                        <span class="trade-date" th:text="${#temporals.format(trade.createdAt, 'd. MMM')}">10. maj</span>
+                    </div>
+                    <div class="trade-flow">
+                        <div class="trade-side">
+                            <div class="trade-side-label">Du gav</div>
+                            <div class="trade-mini-cards">
+                                <img th:each="tc : ${trade.offered}"
+                                     th:src="${tc.card.pictureRef}"
+                                     th:alt="${tc.card.cardName}"
+                                     class="trade-mini-card">
+                            </div>
+                        </div>
+                        <div class="trade-arrow">⇌</div>
+                        <div class="trade-side">
+                            <div class="trade-side-label">Du ville have</div>
+                            <div class="trade-mini-cards">
+                                <img th:each="tc : ${trade.wanted}"
+                                     th:src="${tc.card.pictureRef}"
+                                     th:alt="${tc.card.cardName}"
+                                     class="trade-mini-card">
+                            </div>
+                        </div>
+                    </div>
+                    <a th:href="@{/trades/{id}(id=${trade.tradeId})}" class="btn btn-secondary btn-block">Se detaljer</a>
+                </article>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-ornament">⚜ ✦ ⚜</div>
+        <p class="footer-text">Deckforge · Anno MMXXVI</p>
+    </div>
+</footer>
+
+</body>
+</html>
