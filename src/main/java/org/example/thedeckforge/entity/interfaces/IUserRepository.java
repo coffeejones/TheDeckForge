@@ -18,4 +18,5 @@ public interface IUserRepository {
     UserDetails findUserByEmail(String email);
     Long getUserId(User user);
     void addCardToCollection(User user, Card card);
+    String findNameById(Long userId);
 }

@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS Trade_Cards;
+DROP TABLE IF EXISTS Trades;
 DROP TABLE IF EXISTS DeckCards;
 DROP TABLE IF EXISTS Collections;
 DROP TABLE IF EXISTS Decks;
@@ -57,4 +59,22 @@ create table DeckCards (
                           CardId bigInt,
                           foreign key(DeckId) references Decks(DeckId),
                           foreign key(CardId) references Cards(CardId)
+);
+CREATE TABLE Trades (
+                        tradeId      BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        proposerId   BIGINT NOT NULL,
+                        responderId  BIGINT NULL,
+                        status       VARCHAR(20) NOT NULL DEFAULT 'OPEN',
+                        createdAt    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        resolvedAt   TIMESTAMP NULL,
+                        FOREIGN KEY (proposerId)  REFERENCES Users(UserId),
+                        FOREIGN KEY (responderId) REFERENCES Users(UserId)
+);
+CREATE TABLE Trade_Cards (
+                             tradeCardId  BIGINT AUTO_INCREMENT PRIMARY KEY,
+                             tradeId      BIGINT NOT NULL,
+                             cardId       BIGINT NOT NULL,
+                             direction    VARCHAR(20) NOT NULL,
+                             FOREIGN KEY (tradeId) REFERENCES Trades(tradeId) ON DELETE CASCADE,
+                             FOREIGN KEY (cardId)  REFERENCES Cards(CardId)
 );

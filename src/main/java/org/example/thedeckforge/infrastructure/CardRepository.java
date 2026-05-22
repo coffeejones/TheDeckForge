@@ -117,7 +117,23 @@ public class CardRepository implements ICardRepository {
         return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("CardId"), card.getCardName());
     }
 
+    public List<Card> searchPaginated(String searchTerm, int page, int pageSize) {
+        String sql = """
+        SELECT CardId, CharacterName, CardType, Color, CardSet, Rarity,
+               RuleText, PictureReference, ManaCost, ATK, DEF
+        FROM Cards
+        WHERE CharacterName LIKE ?
+        ORDER BY CharacterName
+        LIMIT ? OFFSET ?
+        """;
+        String pattern = "%" + searchTerm + "%";
+        return jdbcTemplate.query(sql, cardRowMapper(), pattern, pageSize, page * pageSize);
+    }
 
-
+    public int countSearchResults(String searchTerm) {
+        String sql = "SELECT COUNT(*) FROM Cards WHERE CharacterName LIKE ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, "%" + searchTerm + "%");
+        return count != null ? count : 0;
+    }
 
 }

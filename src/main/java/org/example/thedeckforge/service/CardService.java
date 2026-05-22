@@ -99,4 +99,12 @@ public class CardService {
 
         return cardRepository.returnCardById(criteria).orElseThrow(() -> new RuntimeException("Card with id " + id + " does not exist"));
     }
+
+    public List<Card> searchPaginated(String searchTerm, int page, int pageSize) {
+        return cardRepository.searchPaginated(searchTerm, page, pageSize);
+    }
+
+    public int countSearchResults(String searchTerm) {
+        return cardRepository.countSearchResults(searchTerm);
+    }
 }

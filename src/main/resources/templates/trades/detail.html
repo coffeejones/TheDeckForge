@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Byttehandel — Deckforge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/trades.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<section class="trades-page">
+    <div class="container">
+
+        <a th:href="@{/trades}" class="hero-eyebrow trade-back-link">‹ Tilbage til bazaaren</a>
+
+        <header class="collection-header">
+            <span class="trade-status trade-status-big"
+                  th:classappend="|status-${#strings.toLowerCase(trade.status)}|"
+                  th:text="${trade.status}">OPEN</span>
+            <h1>Byttehandel #<span th:text="${trade.tradeId}">42</span></h1>
+            <p class="section-subtitle">
+                Foreslået af <strong th:text="${proposerName}">Marcus</strong>
+                · <span th:text="${#temporals.format(trade.createdAt, 'd. MMMM yyyy')}">10. maj 2026</span>
+            </p>
+        </header>
+
+        <!-- Hoved-handel -->
+        <div class="trade-detail-flow">
+            <div class="trade-detail-side">
+                <h3 class="trade-detail-side-title">Tilbyder</h3>
+                <div class="trade-detail-cards">
+                    <div th:each="tc : ${trade.offered}" class="trade-detail-card">
+                        <img th:src="${tc.card.pictureRef}" th:alt="${tc.card.cardName}">
+                        <div class="trade-detail-card-name" th:text="${tc.card.cardName}">Card</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="trade-detail-arrow">⇌</div>
+
+            <div class="trade-detail-side">
+                <h3 class="trade-detail-side-title">Vil have</h3>
+                <div class="trade-detail-cards">
+                    <div th:each="tc : ${trade.wanted}" class="trade-detail-card">
+                        <img th:src="${tc.card.pictureRef}" th:alt="${tc.card.cardName}">
+                        <div class="trade-detail-card-name" th:text="${tc.card.cardName}">Card</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modforslag (hvis det findes) -->
+        <div th:if="${trade.status.name() == 'COUNTER_PROPOSED'}" class="trade-counter-section">
+            <div class="trade-counter-divider">
+                <span>⚡ Modforslag fra <strong th:text="${responderName}">Sara</strong> ⚡</span>
+            </div>
+            <p class="section-subtitle" style="text-align:center;margin-bottom:24px;">
+                <strong th:text="${responderName}">Sara</strong> vil ikke give præcis det du ønskede,
+                men foreslår disse kort i stedet:
+            </p>
+            <div class="trade-detail-counter-cards">
+                <div th:each="tc : ${trade.counterOffered}" class="trade-detail-card">
+                    <img th:src="${tc.card.pictureRef}" th:alt="${tc.card.cardName}">
+                    <div class="trade-detail-card-name" th:text="${tc.card.cardName}">Card</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action buttons — varierer baseret på status & rolle -->
+        <div class="trade-actions-bar">
+
+            <!-- 1. Jeg er PROPOSER og trade er OPEN → kun annullér -->
+            <th:block th:if="${isProposer and trade.status.name() == 'OPEN'}">
+                <p class="trade-action-hint">Din handel venter på at nogen accepterer den.</p>
+                <form th:action="@{/trades/{id}/decline(id=${trade.tradeId})}" method="post" class="trade-action-form">
+                    <button type="submit" class="btn btn-secondary">Træk tilbage</button>
+                </form>
+            </th:block>
+
+            <!-- 2. Jeg er PROPOSER og trade er COUNTER_PROPOSED → godkend/afvis -->
+            <th:block th:if="${isProposer and trade.status.name() == 'COUNTER_PROPOSED'}">
+                <p class="trade-action-hint">
+                    <strong th:text="${responderName}">Sara</strong> har foreslået et modforslag. Vil du acceptere det?
+                </p>
+                <div class="trade-actions-row">
+                    <form th:action="@{/trades/{id}/decline(id=${trade.tradeId})}" method="post" class="trade-action-form">
+                        <button type="submit" class="btn btn-secondary">Afvis</button>
+                    </form>
+                    <form th:action="@{/trades/{id}/approve-counter(id=${trade.tradeId})}" method="post" class="trade-action-form">
+                        <button type="submit" class="btn btn-primary">✓ Godkend modforslag</button>
+                    </form>
+                </div>
+            </th:block>
+
+            <!-- 3. Jeg er IKKE proposer og trade er OPEN → acceptér/foreslå -->
+            <th:block th:if="${!isProposer and trade.status.name() == 'OPEN'}">
+                <p class="trade-action-hint">Vil du indgå i denne handel?</p>
+                <a th:href="@{/trades/{id}/respond(id=${trade.tradeId})}" class="btn btn-primary">
+                    Acceptér eller foreslå modforslag
+                </a>
+            </th:block>
+
+            <!-- 4. Færdig handel -->
+            <th:block th:if="${trade.status.name() == 'ACCEPTED'}">
+                <p class="trade-action-hint trade-action-success">
+                    ✓ Denne handel er gennemført
+                    <span th:if="${trade.resolvedAt}">
+                        — <span th:text="${#temporals.format(trade.resolvedAt, 'd. MMM yyyy')}">10. maj</span>
+                    </span>
+                </p>
+            </th:block>
+
+            <th:block th:if="${trade.status.name() == 'DECLINED' or trade.status.name() == 'CANCELLED'}">
+                <p class="trade-action-hint trade-action-declined">
+                    Denne handel er afsluttet uden bytte.
+                </p>
+            </th:block>
+
+        </div>
+
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-ornament">⚜ ✦ ⚜</div>
+        <p class="footer-text">Deckforge · Anno MMXXVI</p>
+    </div>
+</footer>
+
+</body>
+</html>
