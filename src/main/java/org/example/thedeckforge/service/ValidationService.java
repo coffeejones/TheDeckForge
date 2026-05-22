@@ -2,7 +2,7 @@ package org.example.thedeckforge.service;
 
 import org.example.thedeckforge.validation.ValidationStrategy;
 import org.example.thedeckforge.validation.ValidationType;
-import org.example.thedeckforge.validation.exceptions.ValidationException;
+import org.example.thedeckforge.entity.exceptions.ValidationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

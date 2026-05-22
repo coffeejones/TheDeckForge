@@ -1,7 +1,7 @@
 package org.example.thedeckforge.entity;
 
 import org.example.thedeckforge.entity.enums.CardType;
-import org.example.thedeckforge.validation.exceptions.CardValidationException;
+import org.example.thedeckforge.entity.exceptions.CardValidationException;
 import java.util.Objects;
 
 public class Card {

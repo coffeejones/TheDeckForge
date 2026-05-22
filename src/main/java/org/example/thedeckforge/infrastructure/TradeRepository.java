@@ -2,6 +2,8 @@ package org.example.thedeckforge.infrastructure;
 
 import org.example.thedeckforge.entity.*;
 import org.example.thedeckforge.entity.enums.CardType;
+import org.example.thedeckforge.entity.enums.TradeDirection;
+import org.example.thedeckforge.entity.enums.TradeStatus;
 import org.example.thedeckforge.entity.interfaces.ITradeRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.example.thedeckforge.entity.TradeDirection.*;
+import static org.example.thedeckforge.entity.enums.TradeDirection.*;
 
 @Repository
 public class TradeRepository implements ITradeRepository {

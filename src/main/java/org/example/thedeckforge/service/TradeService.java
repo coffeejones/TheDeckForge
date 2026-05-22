@@ -3,7 +3,7 @@ package org.example.thedeckforge.service;
 import org.example.thedeckforge.entity.Trade;
 import org.example.thedeckforge.entity.TradeCard;
 import org.example.thedeckforge.entity.User;
-import org.example.thedeckforge.entity.TradeStatus;
+import org.example.thedeckforge.entity.enums.TradeStatus;
 import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
 import org.example.thedeckforge.entity.interfaces.ITradeRepository;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;

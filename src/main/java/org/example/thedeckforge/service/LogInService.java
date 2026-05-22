@@ -4,7 +4,7 @@ import org.example.thedeckforge.entity.Authority;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;
 import org.example.thedeckforge.validation.ValidationType;
-import org.example.thedeckforge.validation.exceptions.ValidationException;
+import org.example.thedeckforge.entity.exceptions.ValidationException;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

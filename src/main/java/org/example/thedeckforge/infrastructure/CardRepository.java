@@ -6,7 +6,6 @@ import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.example.thedeckforge.infrastructure.sqlquerybuilders.CardSQLQueryBuilder;
-import org.example.thedeckforge.infrastructure.sqlquerybuilders.SQLQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -59,7 +58,7 @@ public class CardRepository implements ICardRepository {
     public Optional<Card> returnCardById(ObjectSearchCriteria  criteria) {
         List<Object> params = new ArrayList<>();
         String sqlQuery = cardSQLQueryBuilder.buildQuery(criteria, params);
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) ->
+        return (Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, (rs, rowNum) ->
                 new Card(rs.getLong("CardId"),
                         rs.getString("CharacterName"),
                         CardType.valueOf(rs.getString("CardType").toUpperCase()),
@@ -72,7 +71,7 @@ public class CardRepository implements ICardRepository {
                         rs.getInt("ATK"),
                         rs.getInt("DEF")
                 ), params.toArray()
-        ));
+        )));
     }
     @Override
     public void saveCard(Card card) {

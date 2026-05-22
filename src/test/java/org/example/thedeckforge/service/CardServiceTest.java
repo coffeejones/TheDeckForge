@@ -6,7 +6,7 @@ import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.enums.Roles;
-import org.example.thedeckforge.validation.exceptions.ValidationException;
+import org.example.thedeckforge.entity.exceptions.ValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.example.thedeckforge.validation.exceptions;
+package org.example.thedeckforge.entity.exceptions;
 
 public class CardValidationException extends ValidationException {
     public CardValidationException(String message) {

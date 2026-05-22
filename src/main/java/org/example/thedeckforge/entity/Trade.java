@@ -1,6 +1,7 @@
 package org.example.thedeckforge.entity;
 
-import java.time.LocalDate;
+import org.example.thedeckforge.entity.enums.TradeStatus;
+
 import java.time.LocalDateTime;
 import java.util.List;
 

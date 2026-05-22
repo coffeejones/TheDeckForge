@@ -1,7 +1,7 @@
 package org.example.thedeckforge.entity.interfaces;
 
 import org.example.thedeckforge.entity.Trade;
-import org.example.thedeckforge.entity.TradeStatus;
+import org.example.thedeckforge.entity.enums.TradeStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

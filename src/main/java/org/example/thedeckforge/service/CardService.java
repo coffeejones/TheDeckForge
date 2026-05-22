@@ -92,7 +92,7 @@ public class CardService {
 
         ObjectSearchCriteria criteria = objectSearchCriteriaService.createSearchCriteria(id);
 
-        return cardRepository.returnCardById(criteria).orElseThrow(() -> new RuntimeException("Card with id " + id + " does not exist"));
+        return cardRepository.returnCardById(criteria).orElseThrow();
     }
 
     public List<Card> searchPaginated(String searchTerm, int page, int pageSize) {

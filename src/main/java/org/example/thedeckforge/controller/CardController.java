@@ -41,6 +41,7 @@ public class CardController {
     }
     @GetMapping("/card-detail/{cardName}")
     public String cardDetail(@PathVariable String cardName, Model model, @AuthenticationPrincipal User user) {
+        System.out.println("cardName from URL: '" + cardName + "'");
         Card card = cardService.getCardByName(cardName);
         model.addAttribute("card", card);
         model.addAttribute("hasCard", user != null && collectionService.userHadCard(card, user));

@@ -1,5 +1,7 @@
 package org.example.thedeckforge.entity;
 
+import org.example.thedeckforge.entity.enums.TradeDirection;
+
 public class TradeCard {
 
     private Long tradeCardId;

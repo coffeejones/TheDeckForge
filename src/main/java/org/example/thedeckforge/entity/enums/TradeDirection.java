@@ -1,4 +1,4 @@
-package org.example.thedeckforge.entity;
+package org.example.thedeckforge.entity.enums;
 
 public enum TradeDirection {
     OFFERED,

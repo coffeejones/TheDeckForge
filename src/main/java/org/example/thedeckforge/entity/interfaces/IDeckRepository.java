@@ -6,6 +6,7 @@ import org.example.thedeckforge.entity.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IDeckRepository {
@@ -15,5 +16,5 @@ public interface IDeckRepository {
     void saveDeck(List<Long> cardIds, Deck deck);
     void deleteDeck(Deck deck);
     void deleteCardReferenceFromDeck(long id);
-    Long getCommanderCardIdForDeck(Deck deck);
+    Optional<Long> getCommanderCardIdForDeck(Deck deck);
 }

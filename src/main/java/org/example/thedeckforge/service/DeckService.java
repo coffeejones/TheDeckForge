@@ -1,7 +1,9 @@
 package org.example.thedeckforge.service;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
+import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.User;
+import org.example.thedeckforge.entity.enums.FormatType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
 import org.example.thedeckforge.entity.interfaces.IDeckRepository;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -20,13 +23,15 @@ public class DeckService {
     private final ValidationService validationService;
     private final IUserRepository userRepository;
     private final ICardRepository cardRepository;
+    private final ObjectSearchCriteriaService criteria;
 
     @Autowired
-    public DeckService(IDeckRepository deckRepository, ValidationService validationService, IUserRepository userRepository, ICardRepository cardRepository) {
+    public DeckService(IDeckRepository deckRepository, ValidationService validationService, IUserRepository userRepository, ICardRepository cardRepository, ObjectSearchCriteriaService criteria) {
         this.deckRepository = deckRepository;
         this.validationService = validationService;
         this.userRepository = userRepository;
         this.cardRepository = cardRepository;
+        this.criteria = criteria;
     }
 
     public void createDeck(Deck deck, User user){
@@ -51,14 +56,19 @@ public class DeckService {
     }
     public List<Deck> getUserDecks(User user){
         List<Deck> decks = cardRepository.getDecksCards(deckRepository.getUsersDecks(userRepository.getUserId(user)));
-        for(Deck deck : decks){
-            deck.setCommanderCard(cardRepository.returnCardById());
-        }
         if (decks == null){
             return new ArrayList<>();
-        } else{
-            return decks;
         }
+        for(Deck deck : decks){
+            Optional<Long> commanderCardId = deckRepository.getCommanderCardIdForDeck(deck);
+            if(deck.getFormat() == FormatType.COMMANDER){
+                if(commanderCardId.get() != 0){
+                    deck.setCommanderCard(cardRepository.returnCardById(criteria.createSearchCriteria(commanderCardId.get())).orElse(null));
+                    }
+                }
+
+        }
+        return decks;
     }
     public Deck getDeckForm(){
         return new Deck();

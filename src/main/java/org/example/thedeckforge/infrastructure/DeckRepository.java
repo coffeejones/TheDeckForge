@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public class DeckRepository implements IDeckRepository {
 
@@ -42,10 +44,10 @@ public class DeckRepository implements IDeckRepository {
         return null;
     }
     @Override
-    public Long getCommanderCardIdForDeck(Deck deck){
+    public Optional<Long> getCommanderCardIdForDeck(Deck deck){
         long deckId = getDeckId(deck);
-        String sql = "SELECT cardId FROM Decks WHERE DeckId";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("CommanderCard"), deckId);
+        String sql = "SELECT CommanderCard FROM Decks WHERE DeckId = ?";
+        return (Optional.ofNullable(jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("CommanderCard"), deckId)));
     }
     @Override
     public void saveDeck(List<Long> cardIds, Deck deck){

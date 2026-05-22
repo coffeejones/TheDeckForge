@@ -1,7 +1,7 @@
 package org.example.thedeckforge.validation;
 
 import org.example.thedeckforge.entity.Card;
-import org.example.thedeckforge.validation.exceptions.CardValidationException;
+import org.example.thedeckforge.entity.exceptions.CardValidationException;
 import org.springframework.stereotype.Component;
 
 @Component("CARD")

@@ -19,23 +19,23 @@ public class CollectionService {
         this.collectionRepository = collectionRepository;
         this.userRepository = userRepository;
     }
-    @PreAuthorize("hasRole('MEMEBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     public List<Card> getOwnedCards(long userId, int page, int pageSize) {
         return collectionRepository.findOwnedCardsByUserId(userId, page, pageSize);
     }
-    @PreAuthorize("hasRole('MEMEBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     public int countOwnedCards(long userId) {
         return collectionRepository.countOwnedCardsByUserId(userId);
     }
-    @PreAuthorize("hasRole('MEMEBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     public void addCardToCollection(Card card, User user) {
         userRepository.addCardToCollection(user, card);
     }
-    @PreAuthorize("hasRole('MEMEBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     public boolean userHadCard(Card card, User user) {
         return collectionRepository.userHasCard(user.getId(), card.getId());
     }
-    @PreAuthorize("hasRole('MEMEBER')")
+    @PreAuthorize("hasRole('MEMBER')")
     public void removeCardFromCollection(Card card, User user) {
         collectionRepository.removeCardFromCollection(card.getId(),user.getId());
     }

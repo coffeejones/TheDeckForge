@@ -3,10 +3,12 @@ package org.example.thedeckforge.validation;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.enums.CardType;
-import org.example.thedeckforge.validation.exceptions.DeckRuleException;
-import org.example.thedeckforge.validation.exceptions.ValidationException;
+import org.example.thedeckforge.entity.exceptions.DeckRuleException;
+import org.example.thedeckforge.entity.exceptions.ValidationException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class DeckValidation implements ValidationStrategy {
     @Override
@@ -58,6 +60,30 @@ public class DeckValidation implements ValidationStrategy {
                             throw new DeckRuleException("Commander decks may only have 1 copy of each card except lands.  " + card.getCardName() + " is at fault" );
                         }
                     }
+                }
+                if(deck.getCommanderCard() != null){
+                String commanderManaCost = deck.getCommanderCard().getManaCost();
+                String[] allowedManaCosts = commanderManaCost.split("[{}]");
+                List<String> disallowedManaCosts = new ArrayList<>();
+                disallowedManaCosts.add("U");
+                disallowedManaCosts.add("W");
+                disallowedManaCosts.add("B");
+                disallowedManaCosts.add("G");
+                disallowedManaCosts.add("R");
+                for(String manaCost : allowedManaCosts){
+                    if(disallowedManaCosts.contains(manaCost)){
+                        disallowedManaCosts.remove(manaCost);
+                    }
+                }
+                for(Card card : numberedList.keySet()){
+                    for(String disallowedManaCost : disallowedManaCosts){
+                        if(card.getManaCost().contains(disallowedManaCost)){
+                            throw new DeckRuleException("Commander decks may only have cards that contain the same mana types as the commander card. " + card.getCardName() + " is at fault");
+                        }
+                    }
+                }
+                } else {
+                    throw new DeckRuleException("Commander decks need a commander card");
                 }
             }
         }

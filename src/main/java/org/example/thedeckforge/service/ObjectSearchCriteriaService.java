@@ -1,5 +1,4 @@
 package org.example.thedeckforge.service;
-
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.springframework.stereotype.Service;
