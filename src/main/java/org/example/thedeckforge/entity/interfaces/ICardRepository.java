@@ -10,14 +10,13 @@ import java.util.Optional;
 @Repository
 public interface ICardRepository {
 
+    void populateCardList();
+    List<Card> returnCardList();
     List<Card> returnCardListByName(ObjectSearchCriteria criteria);
-    Optional<Card> returnCardByName(ObjectSearchCriteria criteria);
+    Optional<Card> returnCardById(ObjectSearchCriteria criteria);
+    Optional<Card> returnCardByName(String name);
     void saveCard(Card card);
-    void updateCard(Card card);
-    void deleteCard(long cardId);
     List<Deck> getDecksCards(List<Deck> decks);
-    long getCardId (Card card);
-    Optional<Card> returnCardById(ObjectSearchCriteria  criteria);
-    List<Card> searchPaginated(String searchTerm, int page, int pageSize);
-    int countSearchResults(String searchTerm);
+    long getCardId(Card card);
+
 }

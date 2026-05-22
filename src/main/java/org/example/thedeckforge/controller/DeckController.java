@@ -7,8 +7,9 @@ import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.FormatType;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.DeckService;
+import org.example.thedeckforge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,35 +53,6 @@ public class DeckController {
         model.addAttribute("deck", deck);
 
         return "deck-editor";
-    }
-    @PostMapping("/deck-editor/{cardId}/{deckId}/remove")
-    @ResponseBody
-    public ResponseEntity<String> removeCard(@PathVariable long cardId, @PathVariable String deckId, @AuthenticationPrincipal User user) {
-        System.out.println("Html works");
-        Card card = cardService.getCardById(cardId);
-        deckService.removeCardFromDeck(deckId, user, card);
-        return ResponseEntity.ok("Kort fjernet");
-    }
-    @PostMapping("/deck-editor/{cardId}/{deckId}/add")
-    @ResponseBody
-    public ResponseEntity<String> addCard(@PathVariable long cardId, @PathVariable String deckId, @AuthenticationPrincipal User user) {
-        Card card = cardService.getCardById(cardId);
-        deckService.addCardToDeck(deckId, user, card);
-        return ResponseEntity.ok("Kort tilføjet");
-    }
-    @GetMapping("/deck-editor/{deckId}/save-deck")
-    public String saveDeck(@ModelAttribute("deck") @PathVariable String deckId, @AuthenticationPrincipal User user, Model model) {
-        deckService.saveDeck(deckId, user);
-        model.addAttribute("user", user);
-        return "user-decks";
-    }
-    @GetMapping("/view")
-    public String viewDecks(Model model, @AuthenticationPrincipal User user) {
-        List<Deck> decks = deckService.getAllDecks();
-        user.setDecks(decks);
-        model.addAttribute("user", user);
-        model.addAttribute("decks", decks);
-        return "decks/view";
     }
 }
 
