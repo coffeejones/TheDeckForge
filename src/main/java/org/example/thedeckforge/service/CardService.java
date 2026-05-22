@@ -1,10 +1,8 @@
 package org.example.thedeckforge.service;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.ObjectSearchCriteria;
-import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.interfaces.ICardRepository;
-import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;

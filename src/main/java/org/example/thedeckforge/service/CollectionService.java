@@ -4,7 +4,6 @@ import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;
-import org.example.thedeckforge.validation.ValidationType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 

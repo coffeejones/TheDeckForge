@@ -43,7 +43,4 @@ public class LogInService {
     public User getUserFromAuthority(Authority authority){
         return userRepository.getUserFromAuth(authority);
     }
-    public Authority getLoginRequest() {
-        return new Authority();
-    }
 }
