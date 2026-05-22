@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface ICardRepository {
 
     List<Card> returnCardListByName(ObjectSearchCriteria criteria);
@@ -20,4 +19,5 @@ public interface ICardRepository {
     Optional<Card> returnCardById(ObjectSearchCriteria  criteria);
     List<Card> searchPaginated(String searchTerm, int page, int pageSize);
     int countSearchResults(String searchTerm);
+
 }

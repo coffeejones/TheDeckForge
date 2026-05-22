@@ -17,6 +17,7 @@ public class CardSQLQueryBuilder extends SQLQueryBuilder {
 
     protected String getBaseSQLQuery() {
         return "SELECT * FROM Cards";
+
     }
 
 

@@ -9,5 +9,6 @@ public enum CardType {
     BATTLE,
     INSTANT,
     SORCERY,
-    KINDRED
+    KINDRED,
+    LEGENDARY_CREATURE
 }

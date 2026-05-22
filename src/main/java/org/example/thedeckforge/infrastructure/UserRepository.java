@@ -4,7 +4,6 @@ import org.example.thedeckforge.entity.Authority;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.Roles;
-import org.example.thedeckforge.entity.interfaces.IUserRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class UserRepository implements IUserRepository {
+public class UserRepository implements org.example.thedeckforge.entity.interfaces.IUserRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -88,7 +87,7 @@ public class UserRepository implements IUserRepository {
                 ),email
         );
     }
-    @Override
+
     public User findByEmail(String email) {
         String sql = """
         SELECT u.UserId, u.Name, u.Age, c.Email, c.UserRole
@@ -111,6 +110,7 @@ public class UserRepository implements IUserRepository {
             return user;
         }, email);
     }
+
     @Override
     public Long getUserId(User user){
         String sql = "SELECT UserId FROM Users LEFT JOIN Credentials ON Users.UserCredentialsId = Credentials.CredentialsId WHERE Email = ?";

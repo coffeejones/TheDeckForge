@@ -1,62 +1,68 @@
 package org.example.thedeckforge.service;
 
 import org.example.thedeckforge.entity.Event;
-import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.interfaces.IEventRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class EventService {
-    private final IEventRepository ieventRepository;
 
-    @Autowired
-    public EventService(IEventRepository ieventRepository) {
-        this.ieventRepository = ieventRepository;
+    private final IEventRepository eventRepository;
+
+    public EventService(IEventRepository eventRepository) {
+        this.eventRepository = eventRepository;
     }
-
 
     public List<Event> getAllEvents() {
-        return ieventRepository.findAll();
+        return eventRepository.findAll();
     }
-
 
     public Optional<Event> getEventById(long id) {
-        return ieventRepository.findById(id);
+        return eventRepository.findById(id);
     }
 
-    public Event createEvent(Event event) {
-        return ieventRepository.save(event);
+    public Event createEvent(Event event, long ownerId) {
+        event.setOwnerId(ownerId);
+        return eventRepository.save(event);
     }
 
-    public Event updateEvent(long id, Event updateEvent) {
-        Event existing = ieventRepository.findById(id)
+    // In EventService
+    public Event updateEvent(long id, Event updatedEvent, long requestingUserId, boolean isAdmin) {
+        Event existing = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + id));
 
-        existing.setName(updateEvent.getName());
-        existing.setDate(updateEvent.getDate());
-        existing.setLocation(updateEvent.getDescription());
-        existing.setParticipants(updateEvent.getParticipants());
+        if (!isAdmin && !existing.getOwnerId().equals(requestingUserId)) {
+            throw new RuntimeException("Not authorized");
+        }
 
+        existing.setName(updatedEvent.getName());
+        existing.setDate(updatedEvent.getDate());
+        existing.setLocation(updatedEvent.getLocation());
+        existing.setDescription(updatedEvent.getDescription());
+
+        eventRepository.update(existing);
         return existing;
     }
 
-    public boolean deleteEvent(long id) {
-        return ieventRepository.deleteById(id);
+    public boolean deleteEvent(long id, long requestingUserId, boolean isAdmin) {
+        Event existing = eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
+
+        if (!isAdmin && !existing.getOwnerId().equals(requestingUserId)) {
+            throw new RuntimeException("Not authorized");
+        }
+
+        return eventRepository.deleteById(id);
     }
 
-    public boolean addParticipant(long id, long userId) {
-        Event event = ieventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
-        if (!event.getParticipants().contains(userId)) {
-            event.getParticipants().add(userId);
-            return true;
+    public boolean joinEvent(long eventId, long userId) {
+        if (eventRepository.participantExists(eventId, userId)) {
+            return false; // already joined
         }
-        return false;
+        eventRepository.addParticipant(eventId, userId);
+        return true;
     }
 }

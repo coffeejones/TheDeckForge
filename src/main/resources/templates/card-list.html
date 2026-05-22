@@ -27,6 +27,14 @@
                    class="form-input"
                    placeholder="Søg igen..."
                    th:value="${param.searchTerm}">
+            <select name="cardType" class="form-input">
+                <option value="">Alle typer</option>
+                <option th:each="type : ${cardTypes}"
+                        th:value="${type}"
+                        th:text="${type}"
+                        th:selected="${param.cardType == type.name()}">
+                </option>
+            </select>
             <button type="submit" class="btn btn-primary">Søg</button>
         </form>
 
@@ -56,6 +64,5 @@
         <p class="footer-text">Deckforge · Anno MMXXVI</p>
     </div>
 </footer>
-
 </body>
 </html>

@@ -28,13 +28,15 @@ public class CardController {
     @GetMapping("/card-search")
     public String cardController(Model model) {
         model.addAttribute("searchTerm", "");
+        model.addAttribute("cardTypes", CardType.values());
         return "card-search";
     }
     @GetMapping("/card-list")
-    public String cardListController(@RequestParam String searchTerm, Model model, CardType cardType) {
+    public String cardListController(@RequestParam String searchTerm, @RequestParam(required = false) CardType cardType, Model model) {
         List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm, cardType);
         model.addAttribute("searchResults", searchResults);
         model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("cardTypes", CardType.values());
         return "card-list";
     }
     @GetMapping("/card-detail/{cardName}")

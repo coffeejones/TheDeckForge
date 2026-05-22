@@ -9,6 +9,7 @@ public class Deck {
     private String name;
     private List<Card> cards;
     private FormatType format;
+    private Card commanderCard;
 
     public Deck(long deckId, String name, FormatType format) {
         this.deckId = deckId;
@@ -22,6 +23,11 @@ public class Deck {
         this.format = format;
     }
     public Deck(String name, FormatType format) {
+        this.name = name;
+        this.format = format;
+    }
+    public Deck(long deckId, String name, FormatType format, Card commanderCard){
+        this.deckId = deckId;
         this.name = name;
         this.format = format;
     }
@@ -44,15 +50,6 @@ public class Deck {
     public void setCards(List<Card> cards) {
         this.cards = cards;
     }
-    public FormatType getFormat() {
-        return format;
-    }
-    public void setFormat(FormatType format) {
-        this.format = format;
-    }
-    public void addCard(Card card){
-        this.cards.add(card);
-    }
     public void removeCard(Card card){
         for(Card c : cards){
             if(c.getId() == card.getId()){
@@ -62,4 +59,20 @@ public class Deck {
             }
         }
     }
+    public void addCard(Card card){
+        this.cards.add(card);
+    }
+    public FormatType getFormat() {
+        return format;
+    }
+    public void setFormat(FormatType format) {
+        this.format = format;
+    }
+    public Card getCommanderCard() {
+        return commanderCard;
+    }
+    public void setCommanderCard(Card commanderCard) {
+        this.commanderCard = commanderCard;
+    }
+
 }

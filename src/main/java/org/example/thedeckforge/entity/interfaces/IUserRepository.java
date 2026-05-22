@@ -13,7 +13,6 @@ public interface IUserRepository {
     void createUser(User user);
     User getUserFromAuth(Authority userAuth);
     Long getUserLoginId(Authority userAuth);
-    User findByEmail(String email);
     Authority getAuthorityByEmail(String email);
     UserDetails findUserByEmail(String email);
     Long getUserId(User user);

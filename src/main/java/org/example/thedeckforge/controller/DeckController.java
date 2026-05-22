@@ -4,6 +4,7 @@ package org.example.thedeckforge.controller;
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
 import org.example.thedeckforge.entity.User;
+import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.enums.FormatType;
 import org.example.thedeckforge.service.CardService;
 import org.example.thedeckforge.service.DeckService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -47,16 +49,26 @@ public class DeckController {
     }
     @GetMapping("/deck-editor/{id}")
     public String showDeckEditor(@PathVariable String id, Model model,@AuthenticationPrincipal User user) {
-        user.setDecks(deckService.getUserDecks(user));
         Deck deck = deckService.getSpecificDeckFromUser(user, id);
+        HashMap<Card, Integer> presentableCards = deckService.getPresentableDeck(deck);
         model.addAttribute("deck", deck);
-
+        model.addAttribute("presentableCards", presentableCards);
+        return "deck-editor";
+    }
+    @GetMapping("/deck-editor/{deckId}/deck-card-list")
+    public String deckCardListController(@RequestParam String searchTerm, Model model, CardType cardType, @AuthenticationPrincipal User user, @PathVariable String deckId){
+        List<Card> searchResults = cardService.getCardListBasedOnSearchTerm(searchTerm, cardType);
+        Deck deck = deckService.getSpecificDeckFromUser(user, deckId);
+        HashMap<Card, Integer> presentableCards = deckService.getPresentableDeck(deck);
+        model.addAttribute("deck", deck);
+        model.addAttribute("presentableCards", presentableCards);
+        model.addAttribute("searchResults", searchResults);
+        model.addAttribute("searchTerm", searchTerm);
         return "deck-editor";
     }
     @PostMapping("/deck-editor/{cardId}/{deckId}/remove")
     @ResponseBody
     public ResponseEntity<String> removeCard(@PathVariable long cardId, @PathVariable String deckId, @AuthenticationPrincipal User user) {
-        System.out.println("Html works");
         Card card = cardService.getCardById(cardId);
         deckService.removeCardFromDeck(deckId, user, card);
         return ResponseEntity.ok("Kort fjernet");
@@ -74,13 +86,28 @@ public class DeckController {
         model.addAttribute("user", user);
         return "user-decks";
     }
-    @GetMapping("/view")
-    public String viewDecks(Model model, @AuthenticationPrincipal User user) {
-        List<Deck> decks = deckService.getAllDecks();
-        user.setDecks(decks);
-        model.addAttribute("user", user);
-        model.addAttribute("decks", decks);
-        return "decks/view";
+    @GetMapping("/deck-editor/deckId/delete-deck")
+    public String deleteDeck(@RequestParam String deckId, @AuthenticationPrincipal User user) {
+        deckService.deleteDeck(deckId, user);
+        return "redirect:/decks/user-decks";
     }
-}
+    @GetMapping("/deckId/deck-name-editor")
+    public String deckNameEditor(Model model, @PathVariable String deckId) {
+        model.addAttribute("deckId", deckId);
+        model.addAttribute("deck", deckService.getDeckForm());
+        return "deck-name-editor";
+    }
+    @PostMapping("/deckId/deck-edit")
+    public String deckNameEditorForm(@ModelAttribute("deck") Deck deck, @PathVariable String deckId, @AuthenticationPrincipal User user, Model model) {
+        deckService.deckNameEdit(deckId, deck.getName(), user);
+        saveDeck(deckId, user, model);
+        return "redirect:deck-editor/deckId";
+    }
+    @PostMapping("/deck-editor/cardId/deckId/addCommander")
+    public String addCommander(@PathVariable String deckId,@PathVariable long cardId, @AuthenticationPrincipal User user, Model model) {
+        Card card = cardService.getCardById(cardId);
+        deckService.setCommanderCard(deckId, user, card);
+        return "redirect:deck-editor/deckId";
+    }
 
+}

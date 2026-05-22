@@ -1,6 +1,9 @@
 package org.example.thedeckforge.infrastructure;
 
+import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
+import org.example.thedeckforge.entity.User;
+import org.example.thedeckforge.entity.enums.CardType;
 import org.example.thedeckforge.entity.enums.FormatType;
 import org.example.thedeckforge.entity.interfaces.IDeckRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,7 +14,7 @@ import java.util.List;
 @Repository
 public class DeckRepository implements IDeckRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
 
     public DeckRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -38,9 +41,11 @@ public class DeckRepository implements IDeckRepository {
         }
         return null;
     }
-    private long getDeckId(Deck deck){
-        String  sql = "SELECT * FROM Decks WHERE DeckName = ?";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("DeckId"),deck.getName() );
+    @Override
+    public Long getCommanderCardIdForDeck(Deck deck){
+        long deckId = getDeckId(deck);
+        String sql = "SELECT cardId FROM Decks WHERE DeckId";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("CommanderCard"), deckId);
     }
     @Override
     public void saveDeck(List<Long> cardIds, Deck deck){
@@ -51,29 +56,25 @@ public class DeckRepository implements IDeckRepository {
         for (Long cardId : cardIds) {
             jdbcTemplate.update(saveSql, deckId, cardId);
         }
+        String commanderSaveSql = "INSERT INTO Decks (CommanderCard) VALUES (?) where DeckId = ?";
+        jdbcTemplate.update(commanderSaveSql, deck.getCommanderCard().getId(), getDeckId(deck));
+    }
+    @Override
+    public void deleteDeck(Deck deck){
+        String deleteDeckCardsSql = "delete from deckCards where DeckId = ?";
+        jdbcTemplate.update(deleteDeckCardsSql, getDeckId(deck));
+        String deleteDeckSql = "delete from decks where DeckId = ?";
+        jdbcTemplate.update(deleteDeckSql, getDeckId(deck));
     }
 
-    @Override
-    public List<Deck> getAllDecks(){
-        String sql = "SELECT * FROM Decks";
-        List<Deck> decks =  new ArrayList<>(jdbcTemplate.query(sql, (rs, rowNum) ->
-                new Deck(
-                        rs.getLong("DeckId"),
-                        rs.getString("DeckName"),
-                        FormatType.valueOf(rs.getString("Format").toUpperCase())
-                )
-        ));
-        if (!decks.isEmpty()) {
-            return decks;
-        }
-        return null;
+    private Long getDeckId(Deck deck){
+        String sql = "SELECT DeckId FROM Decks WHERE DeckName = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{deck.getName()}, Long.class);
     }
     @Override
     public void deleteCardReferenceFromDeck(long id){
         String sqlQuery = "DELETE FROM DeckCards WHERE CardId = ?";
         jdbcTemplate.update(sqlQuery,id);
     }
-
-
 
 }

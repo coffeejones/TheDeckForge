@@ -12,7 +12,7 @@
         <ul class="nav-links">
             <li><a th:href="@{/}" class="nav-link">Hjem</a></li>
             <li><a th:href="@{/cards/card-search}" class="nav-link">Se kort</a></li>
-            <li><a th:href="@{/decks/view}" class="nav-link">Decks</a></li>
+            <li><a th:href="@{/decks/user-decks}" class="nav-link">Decks</a></li>
             <li><a th:href="@{/collection}" class="nav-link">Samling</a></li>
             <li><a th:href="@{/trades}" class="nav-link">Byttehandel</a></li>
             <li sec:authorize="isAuthenticated()">
@@ -21,7 +21,7 @@
             </li>
 
             <li sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/admin/admin-panel}" class="nav-link">Admin Panel</a>
+                <a th:href="@{/admin/create-card-form}" class="nav-link">Opret kort</a>
             </li>
 
             <li sec:authorize="isAuthenticated()">

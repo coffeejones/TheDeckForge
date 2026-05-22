@@ -7,9 +7,6 @@ import org.example.thedeckforge.entity.TradeStatus;
 import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
 import org.example.thedeckforge.entity.interfaces.ITradeRepository;
 import org.example.thedeckforge.entity.interfaces.IUserRepository;
-import org.example.thedeckforge.infrastructure.CollectionRepository;
-import org.example.thedeckforge.infrastructure.TradeRepository;
-import org.example.thedeckforge.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,7 +134,7 @@ public class TradeService {
             }
         }
 
-        // 6. ⚡ ATOMISK EJERSKIFTE ⚡
+        // 6.  ATOMISK EJERSKIFTE
         long proposerId = trade.getProposerId();
         long responderId = responder.getId();
 
