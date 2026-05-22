@@ -54,6 +54,7 @@ public class DeckService {
             }
         }
     }
+
     public List<Deck> getAllDecks(){
         return deckRepository.getAllDecks();
     }
