@@ -2,9 +2,7 @@ package org.example.thedeckforge.validation;
 
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.Deck;
-import org.example.thedeckforge.entity.User;
 import org.example.thedeckforge.entity.enums.CardType;
-import org.example.thedeckforge.entity.enums.Roles;
 import org.example.thedeckforge.validation.exceptions.DeckRuleException;
 import org.example.thedeckforge.validation.exceptions.ValidationException;
 

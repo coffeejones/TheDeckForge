@@ -41,4 +41,40 @@ public class DeckRepository implements IDeckRepository {
         }
         return null;
     }
+    @Override
+    public Long getCommanderCardIdForDeck(Deck deck){
+        long deckId = getDeckId(deck);
+        String sql = "SELECT cardId FROM Decks WHERE DeckId";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("CommanderCard"), deckId);
+    }
+    @Override
+    public void saveDeck(List<Long> cardIds, Deck deck){
+        String deleteSql = "delete from deckCards where DeckId = ?";
+        jdbcTemplate.update(deleteSql, getDeckId(deck));
+        Long deckId = getDeckId(deck);
+        String saveSql = "INSERT INTO deckCards (DeckId, CardId) VALUES (?, ?)";
+        for (Long cardId : cardIds) {
+            jdbcTemplate.update(saveSql, deckId, cardId);
+        }
+        String commanderSaveSql = "INSERT INTO Decks (CommanderCard) VALUES (?) where DeckId = ?";
+        jdbcTemplate.update(commanderSaveSql, deck.getCommanderCard().getId(), getDeckId(deck));
+    }
+    @Override
+    public void deleteDeck(Deck deck){
+        String deleteDeckCardsSql = "delete from deckCards where DeckId = ?";
+        jdbcTemplate.update(deleteDeckCardsSql, getDeckId(deck));
+        String deleteDeckSql = "delete from decks where DeckId = ?";
+        jdbcTemplate.update(deleteDeckSql, getDeckId(deck));
+    }
+
+    private Long getDeckId(Deck deck){
+        String sql = "SELECT DeckId FROM Decks WHERE DeckName = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{deck.getName()}, Long.class);
+    }
+    @Override
+    public void deleteCardReferenceFromDeck(long id){
+        String sqlQuery = "DELETE FROM DeckCards WHERE CardId = ?";
+        jdbcTemplate.update(sqlQuery,id);
+    }
+
 }

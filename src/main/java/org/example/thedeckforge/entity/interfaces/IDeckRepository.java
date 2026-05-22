@@ -14,4 +14,6 @@ public interface IDeckRepository {
     void createUserDeck(Deck deck, long userId);
     void saveDeck(List<Long> cardIds, Deck deck);
     void deleteDeck(Deck deck);
+    void deleteCardReferenceFromDeck(long id);
+    Long getCommanderCardIdForDeck(Deck deck);
 }

@@ -26,6 +26,11 @@ public class Deck {
         this.name = name;
         this.format = format;
     }
+    public Deck(long deckId, String name, FormatType format, Card commanderCard){
+        this.deckId = deckId;
+        this.name = name;
+        this.format = format;
+    }
     public Deck(){}
     public long getDeckId() {
         return deckId;

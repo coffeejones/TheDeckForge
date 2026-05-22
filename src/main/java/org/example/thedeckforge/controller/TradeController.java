@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('MEMBER')")
 public class TradeController {
 
-    private static final int CATALOG_PAGE_SIZE = 20;
-    private static final int LARGE_PAGE = 1000;     // til "alle mine kort" på trade-formen
+    private static final int CATALOG_PAGE_SIZE = 24;
+    private static final int LARGE_PAGE = 1000;
 
     private final TradeService tradeService;
     private final CollectionService collectionService;
@@ -36,9 +36,6 @@ public class TradeController {
         this.cardService = cardService;
     }
 
-    // ============================================================
-    // 1. GET /trades — liste-siden
-    // ============================================================
     @GetMapping
     public String list(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("openTrades", tradeService.listOpenTrades());
@@ -47,19 +44,14 @@ public class TradeController {
         return "trades/list";
     }
 
-    // ============================================================
-    // 2. GET /trades/new — vis oprettelses-form
-    // ============================================================
     @GetMapping("/new")
     public String newForm(@AuthenticationPrincipal User user,
                           @RequestParam(defaultValue = "0") int page,
                           @RequestParam(defaultValue = "") String search,
                           Model model) {
 
-        // Egen samling — alle kort, ingen paginering på trade-formen
         model.addAttribute("myCards", collectionService.getOwnedCards(user.getId(), 0, LARGE_PAGE));
 
-        // Katalog — søgning + paginering
         int totalResults = cardService.countSearchResults(search);
         int totalPages = Math.max(1, (int) Math.ceil((double) totalResults / CATALOG_PAGE_SIZE));
 
@@ -77,9 +69,6 @@ public class TradeController {
         return "trades/new";
     }
 
-    // ============================================================
-    // 3. POST /trades/new — opret ny handel
-    // ============================================================
     @PostMapping("/new")
     public String create(
             @AuthenticationPrincipal User user,
@@ -101,9 +90,6 @@ public class TradeController {
         }
     }
 
-    // ============================================================
-    // 4. GET /trades/{id} — detalje-side
-    // ============================================================
     @GetMapping("/{id}")
     public String detail(@PathVariable long id,
                          @AuthenticationPrincipal User user,
@@ -125,9 +111,6 @@ public class TradeController {
         }
     }
 
-    // ============================================================
-    // 5. GET /trades/{id}/respond — vis vælg-kort-side
-    // ============================================================
     @GetMapping("/{id}/respond")
     public String respondForm(@PathVariable long id,
                               @AuthenticationPrincipal User user,
@@ -143,7 +126,6 @@ public class TradeController {
 
             List<Card> myCards = collectionService.getOwnedCards(user.getId(), 0, LARGE_PAGE);
 
-            // JS skal kunne detektere "exact match" — send wanted-IDs som liste
             List<Long> wantedIds = trade.getWanted().stream()
                     .map(tc -> tc.getCard().getId())
                     .collect(Collectors.toList());
@@ -161,10 +143,6 @@ public class TradeController {
         }
     }
 
-    // ============================================================
-    // 6. POST /trades/{id}/respond — submit svar
-    //    Server afgør om det er exact match eller counter-proposal
-    // ============================================================
     @PostMapping("/{id}/respond")
     public String submitResponse(
             @PathVariable long id,
@@ -184,11 +162,9 @@ public class TradeController {
                     .collect(Collectors.toSet());
 
             if (new HashSet<>(responderCardIds).equals(wanted)) {
-                // Exact match — gennemfør med det samme
                 tradeService.acceptExactly(id, user, responderCardIds);
                 redirect.addFlashAttribute("successMessage", "Handel gennemført!");
             } else {
-                // Modforslag — afventer proposer
                 tradeService.counterPropose(id, user, responderCardIds);
                 redirect.addFlashAttribute("successMessage", "Modforslag sendt");
             }
@@ -200,9 +176,6 @@ public class TradeController {
         }
     }
 
-    // ============================================================
-    // 7. POST /trades/{id}/approve-counter — proposer godkender modforslag
-    // ============================================================
     @PostMapping("/{id}/approve-counter")
     public String approveCounter(@PathVariable long id,
                                  @AuthenticationPrincipal User user,
@@ -216,9 +189,6 @@ public class TradeController {
         return "redirect:/trades/" + id;
     }
 
-    // ============================================================
-    // 8. POST /trades/{id}/decline — annullér egen handel eller afvis modforslag
-    // ============================================================
     @PostMapping("/{id}/decline")
     public String cancelOrDecline(@PathVariable long id,
                                   @AuthenticationPrincipal User user,
