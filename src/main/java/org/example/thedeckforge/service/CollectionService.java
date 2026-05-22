@@ -2,10 +2,9 @@ package org.example.thedeckforge.service;
 
 import org.example.thedeckforge.entity.Card;
 import org.example.thedeckforge.entity.User;
-import org.example.thedeckforge.infrastructure.CollectionRepository;
-import org.example.thedeckforge.infrastructure.UserRepository;
-import org.example.thedeckforge.validation.ValidationType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.example.thedeckforge.entity.interfaces.ICollectionRepository;
+import org.example.thedeckforge.entity.interfaces.IUserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,37 +12,36 @@ import java.util.List;
 @Service
 public class CollectionService {
 
-    private final CollectionRepository collectionRepository;
-    private final UserRepository userRepository;
-    private final ValidationService validationService;
+    private final ICollectionRepository collectionRepository;
+    private final IUserRepository userRepository;
 
-    public CollectionService(CollectionRepository collectionRepository, UserRepository userRepository, ValidationService validationService) {
+    public CollectionService(ICollectionRepository collectionRepository, IUserRepository userRepository) {
         this.collectionRepository = collectionRepository;
         this.userRepository = userRepository;
-        this.validationService = validationService;
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public List<Card> getOwnedCards(long userId, int page, int pageSize) {
         return collectionRepository.findOwnedCardsByUserId(userId, page, pageSize);
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public int countOwnedCards(long userId) {
         return collectionRepository.countOwnedCardsByUserId(userId);
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public void addCardToCollection(Card card, User user) {
         userRepository.addCardToCollection(user, card);
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public boolean userHadCard(Card card, User user) {
         return collectionRepository.userHasCard(user.getId(), card.getId());
     }
-
+    @PreAuthorize("hasRole('MEMEBER')")
     public void removeCardFromCollection(Card card, User user) {
         collectionRepository.removeCardFromCollection(card.getId(),user.getId());
     }
-    public void deleteCardReferenceFromCollection(User adminUser,long cardId){
-        validationService.validate(ValidationType.ADMIN, adminUser);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteCardReferenceFromCollection(long cardId){
         collectionRepository.deleteCardFromCollectionReference(cardId);
     }
+
 }

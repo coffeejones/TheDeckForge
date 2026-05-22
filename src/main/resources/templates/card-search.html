@@ -25,6 +25,14 @@
             <input type="text" name="searchTerm"
                    class="form-input"
                    placeholder="Skriv et kortnavn..." autofocus>
+            <select name="cardType" class="form-input">
+                <option value="">Alle typer</option>
+                <option th:each="type : ${cardTypes}"
+                        th:value="${type}"
+                        th:text="${type}"
+                        th:selected="${param.cardType == type.name()}">
+                </option>
+            </select>
             <button type="submit" class="btn btn-primary">Søg</button>
         </form>
     </div>

@@ -26,7 +26,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
